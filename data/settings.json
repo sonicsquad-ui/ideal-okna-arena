@@ -1,0 +1,149 @@
+{
+  "siteName": "Профориентолог Марина Бондарева",
+  "siteDomain": "https://orientirprof.ru",
+  "specialist": {
+    "name": "Марина Бондарева",
+    "role": "Частный эксперт-профориентолог, карьерный консультант",
+    "experience": "Более 5 лет успешной практики",
+    "consultationsCount": "500+",
+    "teensHelped": "380+",
+    "adultsHelped": "140+"
+  },
+  "contacts": {
+    "phone": "+7 903 029 34 34",
+    "phoneRaw": "+79030293434",
+    "phoneSecondary": "+7 910 202 85 72",
+    "email": "sunvard@yandex.ru",
+    "address": "г. Орел, Комсомольская улица, 231",
+    "city": "Орёл",
+    "workHours": "Пн-Пт: 9.00-19.00; Сб, Вс - вых.",
+    "whatsapp": "https://wa.me/79030293434",
+    "telegram": "https://t.me/s/+79030293434",
+    "vk": "https://vk.com/id458165618",
+    "yandexUslugi": "https://yandex.ru/uslugi/profile/MarinaBondareva-1892358"
+  },
+  "header": {
+    "showTopBar": true,
+    "ctaButtonText": "Заказать звонок",
+    "menu": [
+      {
+        "title": "Главная",
+        "url": "/"
+      },
+      {
+        "title": "Обо мне",
+        "url": "/about/"
+      },
+      {
+        "title": "Консультация",
+        "url": "/konsultaciya/"
+      },
+      {
+        "title": "Тест онлайн",
+        "url": "/test/",
+        "badge": "Бесплатно"
+      },
+      {
+        "title": "Услуги и цены",
+        "url": "/service-professional-orientation/",
+        "children": [
+          {
+            "title": "Все услуги и стоимость",
+            "url": "/service-professional-orientation/"
+          },
+          {
+            "title": "Для подростков и школьников",
+            "url": "/proforientaciya-dlya-podrostkov/"
+          },
+          {
+            "title": "Для взрослых (18-50 лет)",
+            "url": "/proforientaciya-dlya-vzroslyh/"
+          },
+          {
+            "title": "Карьерное консультирование",
+            "url": "/karernoe-konsultirovanie/"
+          }
+        ]
+      },
+      {
+        "title": "Кейсы",
+        "url": "/cases/"
+      },
+      {
+        "title": "Блог",
+        "url": "/blog/"
+      },
+      {
+        "title": "Контакты",
+        "url": "/contacts/"
+      }
+    ]
+  },
+  "footer": {
+    "aboutText": "Частный эксперт-профориентолог Марина Бондарева. Помогаю подросткам и взрослым осознанно выбрать профессию, ВУЗ и карьерную траекторию. Очно в Орле и онлайн по всей России.",
+    "copyrightText": "© 2018 - {YEAR} orientirprof.ru - Ваш Профориентолог Марина Бондарева",
+    "privacyUrl": "/privacy/",
+    "serviceLinks": [
+      {
+        "title": "Профориентация подростков",
+        "url": "/proforientaciya-dlya-podrostkov/"
+      },
+      {
+        "title": "Профориентация взрослых",
+        "url": "/proforientaciya-dlya-vzroslyh/"
+      },
+      {
+        "title": "Карьерное консультирование",
+        "url": "/karernoe-konsultirovanie/"
+      },
+      {
+        "title": "Индивидуальная консультация",
+        "url": "/konsultaciya/"
+      },
+      {
+        "title": "Тест на профориентацию онлайн",
+        "url": "/test/"
+      },
+      {
+        "title": "Все услуги и прайс",
+        "url": "/service-professional-orientation/"
+      }
+    ],
+    "infoLinks": [
+      {
+        "title": "Обо мне",
+        "url": "/about/"
+      },
+      {
+        "title": "Кейсы клиентов",
+        "url": "/cases/"
+      },
+      {
+        "title": "Блог и статьи",
+        "url": "/blog/"
+      },
+      {
+        "title": "Контакты и карта",
+        "url": "/contacts/"
+      },
+      {
+        "title": "Политика конфиденциальности",
+        "url": "/privacy/"
+      }
+    ]
+  },
+  "cookieNotice": {
+    "text": "Мы используем файлы cookie и собираем обезличенные аналитические данные для улучшения работы сайта в соответствии с нашей Политикой конфиденциальности.",
+    "buttonText": "Согласен"
+  },
+  "schema": {
+    "orgName": "Профориентация Профориентолог Марина Бондарева",
+    "specialistName": "Марина Бондарева",
+    "jobTitle": "Эксперт Профориентолог, карьерный консультант",
+    "priceRange": "1500 - 9000 RUB",
+    "geo": {
+      "latitude": 52.9341,
+      "longitude": 36.0384
+    }
+  }
+}

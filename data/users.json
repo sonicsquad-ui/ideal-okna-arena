@@ -1,0 +1,9 @@
+{
+  "admin": {
+    "username": "admin",
+    "passwordHash": "286b2777e38a3b3933e40be86829a3311a3ea9d0ab410d29be9b7b3f4ff1bd8b",
+    "salt": "orientir_salt_2026",
+    "name": "Марина Бондарева (Администратор)",
+    "email": "sunvard@yandex.ru"
+  }
+}
