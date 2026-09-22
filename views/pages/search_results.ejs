@@ -1,0 +1,65 @@
+<%- include('../partials/head', { title: 'Результаты поиска: «' + query + '» — Чемпион-Теннис' }) %>
+<%- include('../partials/header', { activeNav: '' }) %>
+<%- include('../partials/breadcrumbs', { breadcrumbs: breadcrumbs }) %>
+
+<main class="page-main">
+  <div class="container">
+    
+    <div class="section-title-bar" style="margin-bottom: 24px;">
+      <div>
+        <h1 class="section-heading" style="font-size: 1.75rem;">
+          <span class="heading-bar"></span>
+          <span>Результаты поиска: «<%= query %>»</span>
+        </h1>
+        <p style="font-size: 0.875rem; color: #64748b; margin-top: 4px;">
+          Найдено совпадений: <strong><%= results.length %></strong>
+        </p>
+      </div>
+    </div>
+
+    <!-- Re-search bar -->
+    <form action="/search" method="GET" style="display: flex; gap: 10px; max-width: 600px; margin-bottom: 32px;">
+      <input type="text" name="q" value="<%= query %>" class="form-control" placeholder="Поиск по сайту..." required>
+      <button type="submit" class="btn-admin btn-admin-primary" style="white-space: nowrap;">
+        Искать снова
+      </button>
+    </form>
+
+    <% if (results.length === 0) { %>
+      <div style="background: white; border-radius: 10px; padding: 40px; text-align: center; border: 1px solid var(--border);">
+        <h3 style="font-size: 1.25rem; margin-bottom: 8px;">К сожалению, ничего не найдено</h3>
+        <p style="color: #64748b;">Попробуйте изменить формулировку запроса или проверьте правильность написания фамилии игрока или термина.</p>
+        <div style="margin-top: 20px;">
+          <a href="/news" class="btn-admin btn-admin-primary">Перейти в ленту новостей &rarr;</a>
+        </div>
+      </div>
+    <% } else { %>
+      <div style="display: flex; flex-direction: column; gap: 16px;">
+        <% results.forEach(function(item) { %>
+          <div style="background: white; border-radius: 8px; border: 1px solid var(--border); padding: 20px; box-shadow: var(--shadow-sm);">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+              <span style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; background: var(--primary-subtle); color: var(--primary); padding: 2px 8px; border-radius: 4px;">
+                <%= item.type_label %>
+              </span>
+              <% if (item.date) { %>
+                <span style="font-size: 0.75rem; color: #94a3b8;"><%= item.date %></span>
+              <% } %>
+            </div>
+            <h2 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 8px;">
+              <a href="<%= item.url %>" style="color: var(--text-main);"><%= item.title %></a>
+            </h2>
+            <p style="font-size: 0.875rem; color: #475569; line-height: 1.5; margin-bottom: 12px;">
+              <%= item.snippet %>
+            </p>
+            <a href="<%= item.url %>" style="color: var(--primary); font-weight: 700; font-size: 0.875rem;">
+              Перейти к материалу &rarr;
+            </a>
+          </div>
+        <% }); %>
+      </div>
+    <% } %>
+
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

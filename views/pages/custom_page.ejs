@@ -1,0 +1,28 @@
+<%- include('../partials/head', { 
+  title: page.meta_title || (page.title + ' — Чемпион-Теннис'),
+  meta_description: page.meta_description,
+  meta_keywords: page.meta_keywords
+}) %>
+
+<%- include('../partials/header', { activeNav: '' }) %>
+<%- include('../partials/breadcrumbs', { breadcrumbs: breadcrumbs }) %>
+
+<main class="page-main">
+  <div class="container">
+    <article class="article-container">
+      <header class="article-header">
+        <h1 class="article-title-main"><%= page.title %></h1>
+        <div class="article-meta-bar">
+          <div>champion-tennis.ru • Редакция</div>
+          <div>Обновлено: <%= page.updated_at %></div>
+        </div>
+      </header>
+
+      <div class="article-content">
+        <%- page.content %>
+      </div>
+    </article>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

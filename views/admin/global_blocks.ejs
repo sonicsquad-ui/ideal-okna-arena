@@ -1,0 +1,118 @@
+<%- include('./admin_layout_header', { 
+  adminTitle: 'Шапка, Футер и Сквозные блоки', 
+  activeTab: 'global_blocks', 
+  pageHeader: 'Редактирование Шапки, Футера, Тикера и Сквозных блоков',
+  stats: stats 
+}) %>
+
+<% if (typeof successMsg !== 'undefined' && successMsg) { %>
+  <div class="alert alert-success"><%= successMsg %></div>
+<% } %>
+
+<form action="/admin/global-blocks" method="POST">
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+    
+    <!-- Header & Ticker Block -->
+    <div class="admin-card">
+      <h2 class="admin-card-title" style="margin-bottom: 16px; border-bottom: 2px solid var(--admin-primary); padding-bottom: 8px;">
+        1. Настройки Шапки (Header) и Тикера
+      </h2>
+
+      <div class="form-group">
+        <label class="form-label">Название портала в шапке:</label>
+        <input type="text" name="site_name" class="form-control" value="<%= blocks.header.site_name %>">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Слоган портала:</label>
+        <input type="text" name="slogan" class="form-control" value="<%= blocks.header.slogan %>">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Текст бегущей строки (Верхний молния-тикер):</label>
+        <textarea name="ticker_text" class="form-control" rows="3"><%= blocks.header.ticker_text %></textarea>
+        <div class="form-hint">Отображается на самом верху сайта во всех разделах</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Ссылка на Telegram-канал:</label>
+        <input type="text" name="social_tg" class="form-control" value="<%= blocks.header.social_tg %>">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Ссылка на ВКонтакте:</label>
+        <input type="text" name="social_vk" class="form-control" value="<%= blocks.header.social_vk %>">
+      </div>
+    </div>
+
+    <!-- Footer Block -->
+    <div class="admin-card">
+      <h2 class="admin-card-title" style="margin-bottom: 16px; border-bottom: 2px solid var(--admin-primary); padding-bottom: 8px;">
+        2. Настройки Футера (Footer)
+      </h2>
+
+      <div class="form-group">
+        <label class="form-label">Краткое описание проекта в футере:</label>
+        <textarea name="footer_about" class="form-control" rows="4"><%= blocks.footer.about_text %></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Текст копирайта:</label>
+        <input type="text" name="footer_copyright" class="form-control" value="<%= blocks.footer.copyright %>">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Правовой дисклеймер (16+ и правила цитирования):</label>
+        <textarea name="footer_disclaimer" class="form-control" rows="3"><%= blocks.footer.disclaimer %></textarea>
+      </div>
+    </div>
+
+    <!-- CTA Newsletter Block -->
+    <div class="admin-card">
+      <h2 class="admin-card-title" style="margin-bottom: 16px; border-bottom: 2px solid var(--admin-accent); padding-bottom: 8px;">
+        3. Сквозной CTA блок «Рассылка»
+      </h2>
+
+      <div class="form-group">
+        <label class="form-label">Заголовок CTA:</label>
+        <input type="text" name="newsletter_title" class="form-control" value="<%= blocks.newsletter_cta.title %>">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Подзаголовок / Описание:</label>
+        <textarea name="newsletter_subtitle" class="form-control" rows="3"><%= blocks.newsletter_cta.subtitle %></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Текст на кнопке отправки:</label>
+        <input type="text" name="newsletter_btn" class="form-control" value="<%= blocks.newsletter_cta.btn_text %>">
+      </div>
+    </div>
+
+    <!-- Cookie Banner Block -->
+    <div class="admin-card">
+      <h2 class="admin-card-title" style="margin-bottom: 16px; border-bottom: 2px solid var(--admin-accent); padding-bottom: 8px;">
+        4. Всплывающее окно Cookie (Новые посетители)
+      </h2>
+
+      <div class="form-group">
+        <label class="form-label">Текст уведомления Cookie:</label>
+        <textarea name="cookie_text" class="form-control" rows="4"><%= blocks.cookie_banner.text %></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Текст кнопки подтверждения:</label>
+        <input type="text" name="cookie_btn_accept" class="form-control" value="<%= blocks.cookie_banner.btn_accept %>">
+      </div>
+    </div>
+
+  </div>
+
+  <div style="margin-top: 24px; text-align: right;">
+    <button type="submit" class="btn-admin btn-admin-primary" style="padding: 12px 32px; font-size: 1rem;">
+      💾 Сохранить все изменения блоков
+    </button>
+  </div>
+</form>
+
+<%- include('./admin_layout_footer') %>

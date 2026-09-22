@@ -1,0 +1,153 @@
+<%- include('./admin_layout_header', { 
+  adminTitle: isNew ? 'Новая статья блога' : 'Редактирование статьи', 
+  activeTab: 'blog', 
+  pageHeader: isNew ? 'Создание аналитической статьи для блога' : ('Редактирование: ' + article.title),
+  stats: stats 
+}) %>
+
+<form action="<%= isNew ? '/admin/blog/new' : ('/admin/blog/edit/' + article.id) %>" method="POST" id="blogEditorForm" enctype="multipart/form-data">
+  <div style="display: grid; grid-template-columns: 1fr 340px; gap: 24px; align-items: start;">
+    
+    <!-- Left Column: Title & Full WYSIWYG Editor -->
+    <div>
+      <div class="admin-card">
+        <div class="form-group">
+          <label class="form-label">Заголовок статьи (H1):</label>
+          <input type="text" name="title" class="form-control" value="<%= article ? article.title : '' %>" required placeholder="Например: Тактический разбор розыгрышей Синнера и Алькараса">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Краткий вводный лид / сниппет (Excerpt):</label>
+          <textarea name="excerpt" class="form-control" rows="2" required placeholder="Краткое содержание статьи для превью на главной и в ленте"><%= article ? article.excerpt : '' %></textarea>
+        </div>
+
+        <div class="form-group">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <label class="form-label" style="margin: 0;">Полный текст статьи (Визуальный редактор):</label>
+            <button type="button" class="btn-admin btn-admin-secondary btn-admin-sm" id="toggleHtmlModeBtn">
+              &lt;/&gt; HTML код
+            </button>
+          </div>
+
+          <!-- WYSIWYG Container -->
+          <div class="wysiwyg-container">
+            <div class="wysiwyg-toolbar">
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="bold" title="Жирный"><b>B</b></button>
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="italic" title="Курсив"><i>I</i></button>
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="underline" title="Подчеркнутый"><u>U</u></button>
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="strikeThrough" title="Зачеркнутый"><s>S</s></button>
+
+              <div class="wysiwyg-divider"></div>
+
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="formatBlock" data-val="h2" title="Заголовок H2"><b>H2</b></button>
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="formatBlock" data-val="h3" title="Заголовок H3"><b>H3</b></button>
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="formatBlock" data-val="p" title="Абзац">¶ P</button>
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="formatBlock" data-val="blockquote" title="Цитата">«» Цитата</button>
+
+              <div class="wysiwyg-divider"></div>
+
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="justifyLeft" title="По левому краю">⇤</button>
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="justifyCenter" title="По центру">↔</button>
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="justifyRight" title="По правому краю">⇥</button>
+
+              <div class="wysiwyg-divider"></div>
+
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="insertUnorderedList" title="Список">• Список</button>
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="insertOrderedList" title="Нумерованный">1. Список</button>
+
+              <div class="wysiwyg-divider"></div>
+
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="createLink" title="Вставить ссылку">🔗 Ссылка</button>
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="unlink" title="Снять ссылку">✂️</button>
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="insertImage" title="Вставить изображение">🖼️ Картинка</button>
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="insertButton" title="Вставить CTA-кнопку">🔘 Кнопка</button>
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="insertHtmlSnippet" title="Вставить HTML код">&lt;HTML&gt;</button>
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="removeFormat" title="Очистить стили">🧹</button>
+            </div>
+
+            <div id="wysiwygEditorArea" class="wysiwyg-editor-area" contenteditable="true">
+              <%- article ? article.content : '<p>Напишите экспертный текст статьи...</p>' %>
+            </div>
+
+            <textarea id="wysiwygHtmlArea" class="wysiwyg-html-area"><%= article ? article.content : '<p>Напишите экспертный текст статьи...</p>' %></textarea>
+            <input type="hidden" name="content" id="contentHiddenInput" value="<%= article ? article.content : '' %>">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Settings & Author -->
+    <div>
+      <div class="admin-card">
+        <h3 class="admin-card-title" style="margin-bottom: 16px;">Параметры статьи</h3>
+
+        <div class="form-group">
+          <label class="form-label">Рубрика блога:</label>
+          <select name="category" class="form-control" required>
+            <option value="previews" <%= article && article.category === 'previews' ? 'selected' : '' %>>Превью и прогнозы</option>
+            <option value="tactics" <%= article && article.category === 'tactics' ? 'selected' : '' %>>Разбор тактики и техники</option>
+            <option value="interviews" <%= article && article.category === 'interviews' ? 'selected' : '' %>>Эксклюзивные интервью</option>
+            <option value="reviews" <%= article && article.category === 'reviews' ? 'selected' : '' %>>Обзоры прошедших турниров</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">URL Slug (транслитерация):</label>
+          <input type="text" name="slug" class="form-control" value="<%= article ? article.slug : '' %>" required placeholder="takticheskiy-razbor-sinner">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Главное изображение (URL или загрузка):</label>
+          <input type="text" name="image" class="form-control" value="<%= article ? article.image : '/images/blog-tactics.jpg' %>" placeholder="/images/blog-tactics.jpg">
+          <input type="file" name="image_file" class="form-control" style="margin-top: 6px;" accept="image/*">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Имя автора (E-E-A-T):</label>
+          <input type="text" name="author_name" class="form-control" value="<%= article ? article.author_name : 'Михаил Соколов' %>" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Должность / статус автора:</label>
+          <input type="text" name="author_role" class="form-control" value="<%= article ? article.author_role : 'Главный редактор, экс-игрок РТТ' %>" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Время чтения (в минутах):</label>
+          <input type="number" name="reading_time" class="form-control" value="<%= article ? article.reading_time : 7 %>" min="1" max="60">
+        </div>
+
+        <div class="form-group" style="display: flex; align-items: center; gap: 8px;">
+          <input type="checkbox" name="is_editors_choice" id="isEditorsChoice" value="1" <%= article && article.is_editors_choice ? 'checked' : '' %>>
+          <label for="isEditorsChoice" class="form-label" style="margin: 0; cursor: pointer;">
+            Отображать в блоке «Выбор редакции» на главной
+          </label>
+        </div>
+
+        <hr style="border:0; border-top:1px solid var(--admin-border); margin: 16px 0;">
+
+        <h4 style="font-size: 0.9375rem; font-weight: 700; margin-bottom: 12px;">SEO Мета-теги</h4>
+
+        <div class="form-group">
+          <label class="form-label">Meta Title:</label>
+          <input type="text" name="meta_title" class="form-control" value="<%= article ? article.meta_title : '' %>">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Meta Description:</label>
+          <textarea name="meta_description" class="form-control" rows="3"><%= article ? article.meta_description : '' %></textarea>
+        </div>
+
+        <div style="margin-top: 24px; display: flex; flex-direction: column; gap: 10px;">
+          <button type="submit" class="btn-admin btn-admin-primary" style="justify-content: center; padding: 12px;">
+            💾 Опубликовать статью
+          </button>
+          <a href="/admin/blog" class="btn-admin btn-admin-secondary" style="justify-content: center;">Отмена</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</form>
+
+<%- include('./admin_layout_footer') %>

@@ -1,0 +1,23 @@
+<%- include('../partials/head', { title: page.meta_title || 'Политика конфиденциальности — Чемпион-Теннис' }) %>
+<%- include('../partials/header', { activeNav: '' }) %>
+<%- include('../partials/breadcrumbs', { breadcrumbs: breadcrumbs }) %>
+
+<main class="page-main">
+  <div class="container">
+    <article class="article-container">
+      <header class="article-header">
+        <h1 class="article-title-main"><%= page.title %></h1>
+        <div class="article-meta-bar">
+          <div>Соответствие 152-ФЗ РФ «О персональных данных»</div>
+          <div>Обновлено: 2026 год</div>
+        </div>
+      </header>
+
+      <div class="article-content">
+        <%- page.content %>
+      </div>
+    </article>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

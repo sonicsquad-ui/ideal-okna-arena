@@ -1,0 +1,30 @@
+<% if (typeof breadcrumbs !== 'undefined' && breadcrumbs && breadcrumbs.length > 0) { %>
+<nav class="breadcrumbs-wrapper" aria-label="Навигация по сайту">
+  <div class="container">
+    <ol class="breadcrumbs-list" itemscope itemtype="https://schema.org/BreadcrumbList">
+      <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="/">
+          <span itemprop="name">Главная</span>
+        </a>
+        <meta itemprop="position" content="1" />
+      </li>
+      <% breadcrumbs.forEach(function(crumb, index) { %>
+        <span class="breadcrumb-separator">/</span>
+        <% if (index === breadcrumbs.length - 1) { %>
+          <li class="breadcrumb-current" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem" aria-current="page">
+            <span itemprop="name"><%= crumb.title %></span>
+            <meta itemprop="position" content="<%= index + 2 %>" />
+          </li>
+        <% } else { %>
+          <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+            <a itemprop="item" href="<%= crumb.url %>">
+              <span itemprop="name"><%= crumb.title %></span>
+            </a>
+            <meta itemprop="position" content="<%= index + 2 %>" />
+          </li>
+        <% } %>
+      <% }); %>
+    </ol>
+  </div>
+</nav>
+<% } %>

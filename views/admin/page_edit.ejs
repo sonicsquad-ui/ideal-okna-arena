@@ -1,0 +1,133 @@
+<%- include('./admin_layout_header', { 
+  adminTitle: isNew ? 'Создание страницы' : 'Редактирование страницы', 
+  activeTab: 'pages', 
+  pageHeader: isNew ? 'Создание новой страницы сайта' : ('Редактирование страницы: ' + page.title),
+  stats: stats 
+}) %>
+
+<form action="<%= isNew ? '/admin/pages/new' : ('/admin/pages/edit/' + page.id) %>" method="POST" id="pageEditorForm">
+  <div style="display: grid; grid-template-columns: 1fr 340px; gap: 24px; align-items: start;">
+    
+    <!-- Main Left: Title & WYSIWYG Editor -->
+    <div>
+      <div class="admin-card">
+        <div class="form-group">
+          <label class="form-label">Заголовок страницы (H1):</label>
+          <input type="text" name="title" id="pageTitleInput" class="form-control" value="<%= page ? page.title : '' %>" required placeholder="Например: Теннисные корты Санкт-Петербурга">
+        </div>
+
+        <div class="form-group">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <label class="form-label" style="margin: 0;">Контент страницы (Визуальный редактор):</label>
+            <button type="button" class="btn-admin btn-admin-secondary btn-admin-sm" id="toggleHtmlModeBtn">
+              &lt;/&gt; HTML код
+            </button>
+          </div>
+
+          <!-- WYSIWYG Container -->
+          <div class="wysiwyg-container">
+            <div class="wysiwyg-toolbar">
+              <!-- Formatting buttons -->
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="bold" title="Жирный (Ctrl+B)"><b>B</b></button>
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="italic" title="Курсив (Ctrl+I)"><i>I</i></button>
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="underline" title="Подчеркнутый"><u>U</u></button>
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="strikeThrough" title="Зачеркнутый"><s>S</s></button>
+
+              <div class="wysiwyg-divider"></div>
+
+              <!-- Headings -->
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="formatBlock" data-val="h2" title="Заголовок H2"><b>H2</b></button>
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="formatBlock" data-val="h3" title="Заголовок H3"><b>H3</b></button>
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="formatBlock" data-val="p" title="Обычный текст">¶ P</button>
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="formatBlock" data-val="blockquote" title="Цитата">«» Цитата</button>
+
+              <div class="wysiwyg-divider"></div>
+
+              <!-- Alignment -->
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="justifyLeft" title="По левому краю">⇤</button>
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="justifyCenter" title="По центру">↔</button>
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="justifyRight" title="По правому краю">⇥</button>
+
+              <div class="wysiwyg-divider"></div>
+
+              <!-- Lists -->
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="insertUnorderedList" title="Маркированный список">• Список</button>
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="insertOrderedList" title="Нумерованный список">1. Список</button>
+
+              <div class="wysiwyg-divider"></div>
+
+              <!-- Links & Media -->
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="createLink" title="Вставить ссылку">🔗 Ссылка</button>
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="unlink" title="Удалить ссылку">✂️ Снять</button>
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="insertImage" title="Вставить изображение">🖼️ Картинка</button>
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="insertButton" title="Вставить кнопку со ссылкой">🔘 Кнопка</button>
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="insertHtmlSnippet" title="Вставить произвольный HTML код">&lt;HTML&gt;</button>
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="removeFormat" title="Очистить форматирование">🧹</button>
+            </div>
+
+            <!-- Visual Content Editable Box -->
+            <div id="wysiwygEditorArea" class="wysiwyg-editor-area" contenteditable="true">
+              <%- page ? page.content : '<p>Начните вводить текст страницы...</p>' %>
+            </div>
+
+            <!-- HTML Raw Source Editor (hidden by default) -->
+            <textarea id="wysiwygHtmlArea" class="wysiwyg-html-area"><%= page ? page.content : '<p>Начните вводить текст страницы...</p>' %></textarea>
+
+            <!-- Hidden input to submit with POST -->
+            <input type="hidden" name="content" id="contentHiddenInput" value="<%= page ? page.content : '' %>">
+          </div>
+          <div class="form-hint">
+            Вы можете редактировать визуально, добавлять картинки, кнопки, ссылки с анкорами или переключиться в режим &lt;/&gt; HTML для вставки произвольных блоков, виджетов и iframe.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: SEO Meta-tags & Actions -->
+    <div>
+      <div class="admin-card">
+        <h3 class="admin-card-title" style="margin-bottom: 16px;">Параметры и Публикация</h3>
+
+        <div class="form-group">
+          <label class="form-label">URL страницы (Slug / транслитерация):</label>
+          <div style="display: flex; align-items: center; gap: 4px;">
+            <span style="color: #64748b; font-size: 0.8125rem;">/</span>
+            <input type="text" name="slug" id="pageSlugInput" class="form-control" value="<%= page ? page.slug : '' %>" required <%= page && page.is_system ? 'readonly' : '' %>>
+          </div>
+          <div class="form-hint">Только латинские буквы, цифры и дефис</div>
+        </div>
+
+        <hr style="border:0; border-top:1px solid var(--admin-border); margin: 16px 0;">
+
+        <h4 style="font-size: 0.9375rem; font-weight: 700; margin-bottom: 12px;">SEO Мета-теги</h4>
+
+        <div class="form-group">
+          <label class="form-label">Meta Title (Тег &lt;title&gt;):</label>
+          <input type="text" name="meta_title" class="form-control" value="<%= page ? page.meta_title : '' %>" placeholder="Заголовок для Яндекса и Google">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Meta Description (Сниппет):</label>
+          <textarea name="meta_description" class="form-control" rows="3" placeholder="Краткое описание страницы (до 160 символов)"><%= page ? page.meta_description : '' %></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Meta Keywords:</label>
+          <input type="text" name="meta_keywords" class="form-control" value="<%= page ? page.meta_keywords : '' %>" placeholder="теннис, турниры, корт">
+        </div>
+
+        <div style="margin-top: 24px; display: flex; flex-direction: column; gap: 10px;">
+          <button type="submit" class="btn-admin btn-admin-primary" style="justify-content: center; padding: 12px;">
+            💾 Сохранить страницу
+          </button>
+          <a href="/admin/pages" class="btn-admin btn-admin-secondary" style="justify-content: center;">
+            Отмена
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</form>
+
+<%- include('./admin_layout_footer') %>

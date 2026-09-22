@@ -1,0 +1,107 @@
+<%- include('../partials/head', { 
+  title: article.meta_title || (article.title + ' — Блог «Чемпион-Теннис»'),
+  meta_description: article.meta_description || article.excerpt,
+  og_image: article.image
+}) %>
+
+<%- include('../partials/header', { activeNav: 'blog' }) %>
+<%- include('../partials/breadcrumbs', { breadcrumbs: breadcrumbs }) %>
+
+<main class="page-main">
+  <div class="container">
+    <article class="article-container">
+      
+      <header class="article-header">
+        <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+          <span class="category-tag <%= article.category %>" style="position: static; background: var(--accent-clay);">
+            <%= categoryLabel %>
+          </span>
+          <span style="font-size: 0.75rem; background: #f1f5f9; padding: 3px 8px; border-radius: 4px; color: #64748b; font-weight: 600;">
+            Экспертная колонка
+          </span>
+        </div>
+
+        <h1 class="article-title-main"><%= article.title %></h1>
+
+        <div class="article-meta-bar">
+          <div class="article-author-info">
+            <img src="<%= article.author_avatar || '/images/author-coach.jpg' %>" alt="<%= article.author_name %>" class="author-thumb-round">
+            <div>
+              <div class="author-name-text"><%= article.author_name %></div>
+              <div class="author-role-sub"><%= article.author_role %></div>
+            </div>
+          </div>
+          <div style="display: flex; gap: 14px; align-items: center;">
+            <span>⏱️ <%= article.reading_time %> мин чтения</span>
+            <span>👁️ <strong><%= article.views %></strong> просмотров</span>
+            <span>📅 <%= article.published_at_formatted %></span>
+          </div>
+        </div>
+      </header>
+
+      <% if (article.image) { %>
+        <img src="<%= article.image %>" alt="<%= article.title %>" class="article-hero-cover">
+      <% } %>
+
+      <div class="article-content">
+        <!-- Lead intro snippet -->
+        <p style="font-size: 1.15rem; font-weight: 600; color: #334155; line-height: 1.6; border-left: 4px solid var(--accent-clay); padding-left: 14px; margin-bottom: 24px;">
+          <%= article.excerpt %>
+        </p>
+
+        <!-- Full HTML content with headers, quotes, tables -->
+        <%- article.content %>
+      </div>
+
+      <!-- Sharing Bar -->
+      <div class="article-sharing-bar">
+        <div style="font-weight: 700; font-size: 0.875rem; color: #334155;">Поделиться статьей:</div>
+        <div class="social-share-buttons">
+          <a href="https://t.me/share/url?url=<%= encodeURIComponent('https://champion-tennis.ru/blog/' + article.category + '/' + article.slug) %>&text=<%= encodeURIComponent(article.title) %>" target="_blank" rel="noopener" class="share-btn">
+            <span>✈️ Telegram</span>
+          </a>
+          <a href="https://vk.com/share.php?url=<%= encodeURIComponent('https://champion-tennis.ru/blog/' + article.category + '/' + article.slug) %>" target="_blank" rel="noopener" class="share-btn">
+            <span>🔵 ВКонтакте</span>
+          </a>
+          <button type="button" class="share-btn js-copy-link">
+            <span>🔗 Скопировать ссылку</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Author Box (E-E-A-T trust block) -->
+      <div style="margin-top: 36px; padding: 20px; background: #f8fafc; border-radius: 8px; border: 1px solid var(--border); display: flex; align-items: center; gap: 16px;">
+        <img src="<%= article.author_avatar || '/images/author-coach.jpg' %>" alt="<%= article.author_name %>" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover;">
+        <div>
+          <div style="font-weight: 800; font-size: 1.05rem; color: var(--text-main);"><%= article.author_name %></div>
+          <div style="font-size: 0.8125rem; color: var(--primary); font-weight: 600; margin-bottom: 4px;"><%= article.author_role %></div>
+          <p style="font-size: 0.8125rem; color: #64748b; line-height: 1.45;">
+            Постоянный колумнист портала «Чемпион-Теннис». Проводит экспертную экспертизу спортивных матчей, тестирует ракетки и анализирует физиологию теннисных нагрузок.
+          </p>
+        </div>
+      </div>
+
+      <!-- Related Blog Articles -->
+      <% if (relatedArticles && relatedArticles.length > 0) { %>
+        <div style="margin-top: 40px; padding-top: 28px; border-top: 2px solid var(--border);">
+          <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 18px; color: var(--text-main);">
+            Другие материалы из блога:
+          </h3>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
+            <% relatedArticles.forEach(function(rel) { %>
+              <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 14px;">
+                <div style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 4px;"><%= rel.published_at_formatted %></div>
+                <a href="/blog/<%= rel.category %>/<%= rel.slug %>" style="font-weight: 700; font-size: 0.9375rem; color: var(--text-main); line-height: 1.35; display: block;">
+                  <%= rel.title %>
+                </a>
+              </div>
+            <% }); %>
+          </div>
+        </div>
+      <% } %>
+
+    </article>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

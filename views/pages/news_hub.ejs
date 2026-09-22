@@ -1,0 +1,103 @@
+<%- include('../partials/head') %>
+<%- include('../partials/header', { activeNav: 'news', activeCategory: currentCategory }) %>
+<%- include('../partials/breadcrumbs', { breadcrumbs: breadcrumbs }) %>
+
+<main class="page-main">
+  <div class="container">
+    
+    <div class="section-title-bar" style="margin-bottom: 24px;">
+      <div>
+        <h1 class="section-heading" style="font-size: 1.75rem;">
+          <span class="heading-bar"></span>
+          <span><%= categoryTitle %></span>
+        </h1>
+        <p style="font-size: 0.875rem; color: #64748b; margin-top: 4px;">
+          Оперативная хроника теннисных баталий, эксклюзивные комментарии, результаты матчей и аналитические сводки.
+        </p>
+      </div>
+
+      <!-- Filters by Date / Popularity -->
+      <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+        <span style="font-size: 0.8125rem; color: #64748b; font-weight: 600;">Сортировка:</span>
+        <a href="?sort=date<%= currentCategory !== 'all' ? '&category=' + currentCategory : '' %>" 
+           class="subnav-item <%= currentSort === 'date' ? 'active' : '' %>" style="border: 1px solid var(--border);">
+          Свежие (по дате)
+        </a>
+        <a href="?sort=views<%= currentCategory !== 'all' ? '&category=' + currentCategory : '' %>" 
+           class="subnav-item <%= currentSort === 'views' ? 'active' : '' %>" style="border: 1px solid var(--border);">
+          Популярные (по просмотрам)
+        </a>
+      </div>
+    </div>
+
+    <!-- Category Filter Tabs -->
+    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; padding-bottom: 12px; border-bottom: 1px solid var(--border);">
+      <a href="/news" class="subnav-item <%= currentCategory === 'all' ? 'active' : '' %>">Все категории</a>
+      <a href="/news/atp" class="subnav-item <%= currentCategory === 'atp' ? 'active' : '' %>">ATP Тур (Мужчины)</a>
+      <a href="/news/wta" class="subnav-item <%= currentCategory === 'wta' ? 'active' : '' %>">WTA Тур (Женщины)</a>
+      <a href="/news/grand-slam" class="subnav-item <%= currentCategory === 'grand-slam' ? 'active' : '' %>">Большой шлем</a>
+      <a href="/news/team-russia" class="subnav-item <%= currentCategory === 'team-russia' ? 'active' : '' %>">Сборная России / РТТ</a>
+      <a href="/news/padel-pickleball" class="subnav-item <%= currentCategory === 'padel-pickleball' ? 'active' : '' %>">Падел и Пиклбол</a>
+    </div>
+
+    <!-- News Grid -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 24px; margin-bottom: 40px;">
+      <% if (newsList.length === 0) { %>
+        <div style="grid-column: 1 / -1; padding: 40px; text-align: center; background: white; border-radius: 8px;">
+          <h3>В этой категории пока нет опубликованных новостей.</h3>
+          <p style="color: #64748b; margin-top: 8px;">Загляните позже или запустите обновление ленты в панели управления.</p>
+        </div>
+      <% } else { %>
+        <% newsList.forEach(function(item) { %>
+          <article class="news-card-featured">
+            <a href="/news/<%= item.category %>/<%= item.slug %>" class="news-card-img-wrap">
+              <img src="<%= item.image || '/images/hero-tennis-ball.jpg' %>" alt="<%= item.title %>" loading="lazy">
+              <span class="category-tag <%= item.category %>">
+                <%= item.category === 'atp' ? 'ATP Тур' : (item.category === 'wta' ? 'WTA Тур' : (item.category === 'grand-slam' ? 'Большой шлем' : (item.category === 'team-russia' ? 'Сборная РФ' : 'Падел'))) %>
+              </span>
+            </a>
+            <div class="news-card-body">
+              <div class="news-meta-row">
+                <span>⏱️ <%= item.published_at_formatted %></span>
+                <span>👁️ <%= item.views %></span>
+                <span>✍️ <%= item.author %></span>
+              </div>
+              <h2 class="news-card-title">
+                <a href="/news/<%= item.category %>/<%= item.slug %>"><%= item.title %></a>
+              </h2>
+              <p class="news-card-excerpt"><%= item.excerpt %></p>
+              <div class="news-card-footer">
+                <span title="Первоисточник"><%= item.source_name %></span>
+                <a href="/news/<%= item.category %>/<%= item.slug %>" style="color:var(--primary); font-weight:700;">
+                  Читать полностью &rarr;
+                </a>
+              </div>
+            </div>
+          </article>
+        <% }); %>
+      <% } %>
+    </div>
+
+    <!-- RSS & Info Banner -->
+    <div style="background: white; border-radius: 10px; border: 1px solid var(--border); padding: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+      <div>
+        <h3 style="font-size: 1.125rem; font-weight: 700;">Синдикация новостей и RSS ленты</h3>
+        <p style="font-size: 0.84rem; color: #64748b; margin-top: 4px;">
+          Автоматическая трансляция новостей портала «Чемпион-Теннис» доступна по протоколу RSS 2.0 и Google/Яндекс Новостям.
+        </p>
+      </div>
+      <div style="display: flex; gap: 10px;">
+        <a href="/rss.xml" target="_blank" class="btn-admin btn-admin-secondary">
+          <svg style="width:14px; height:14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 5c7.18 0 13 5.82 13 13M6 11a7 7 0 017 7m-6 0a1 1 0 11-2 0 1 1 0 012 0z"></path></svg>
+          <span>Основной RSS</span>
+        </a>
+        <a href="/news-rss.xml" target="_blank" class="btn-admin btn-admin-primary">
+          <span>Срочные новости RSS &rarr;</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

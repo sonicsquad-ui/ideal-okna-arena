@@ -1,0 +1,102 @@
+<%- include('../partials/head', { title: 'Контакты и Реклама — Чемпион-Теннис' }) %>
+<%- include('../partials/header', { activeNav: 'contacts' }) %>
+<%- include('../partials/breadcrumbs', { breadcrumbs: breadcrumbs }) %>
+
+<main class="page-main">
+  <div class="container">
+    <div class="article-container" style="max-width: 960px;">
+      
+      <header class="article-header">
+        <h1 class="article-title-main">Контакты и Размещение Рекламы</h1>
+        <p style="font-size: 1rem; color: #64748b; line-height: 1.6;">
+          Свяжитесь с редакцией «Чемпион-Теннис» по вопросам публикаций, освещения спортивных мероприятий, спонсорских интеграций и размещения баннерной рекламы.
+        </p>
+      </header>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 36px; margin-top: 24px;">
+        
+        <!-- Form Area -->
+        <div>
+          <h2 style="font-size: 1.35rem; font-weight: 800; margin-bottom: 16px; color: var(--text-main);">
+            Форма связи с редакцией
+          </h2>
+          
+          <form id="contactForm" style="display: flex; flex-direction: column; gap: 16px;">
+            <div class="form-group" style="margin: 0;">
+              <label class="form-label">Тип обращения:</label>
+              <select name="form_type" class="form-control" required>
+                <option value="Вопрос в редакцию">Вопрос в редакцию / Пресс-релиз</option>
+                <option value="Размещение рекламы">Размещение рекламы / Спецпроект</option>
+                <option value="Тестирование экипировки">Тестирование ракеток и экипировки</option>
+                <option value="Технический вопрос">Технический вопрос по сайту</option>
+              </select>
+            </div>
+
+            <div class="form-group" style="margin: 0;">
+              <label class="form-label">Ваше имя / Компания:</label>
+              <input type="text" name="name" class="form-control" placeholder="Иван Иванов" required>
+            </div>
+
+            <div class="form-group" style="margin: 0;">
+              <label class="form-label">Ваш контакт (E-mail или телефон):</label>
+              <input type="text" name="contact" class="form-control" placeholder="mail@example.com или +7 999 000-00-00" required>
+            </div>
+
+            <div class="form-group" style="margin: 0;">
+              <label class="form-label">Тема сообщения:</label>
+              <input type="text" name="subject" class="form-control" placeholder="Краткая тема обращения" required>
+            </div>
+
+            <div class="form-group" style="margin: 0;">
+              <label class="form-label">Текст сообщения:</label>
+              <textarea name="message" class="form-control" rows="5" placeholder="Опишите подробно суть предложения или вопроса..." required></textarea>
+            </div>
+
+            <button type="submit" class="btn-cta-submit" style="width: 100%; border: none;">
+              Отправить обращение дежурному редактору &rarr;
+            </button>
+            <p style="font-size: 0.75rem; color: #94a3b8; text-align: center;">
+              Нажимая кнопку, вы соглашаетесь с <a href="/privacy-policy" style="text-decoration: underline;">Политикой обработки персональных данных</a>.
+            </p>
+          </form>
+        </div>
+
+        <!-- Info & Advertising Opportunities -->
+        <div style="background: #f8fafc; border-radius: 10px; border: 1px solid var(--border); padding: 24px;">
+          <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 12px; color: var(--text-main);">
+            Рекламные форматы на Champion-Tennis.ru
+          </h3>
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 12px; font-size: 0.875rem; color: #475569; margin: 0 0 24px 0;">
+            <li style="display: flex; gap: 8px;">
+              <span style="color: var(--primary); font-weight: 800;">✔</span>
+              <span><strong>Сквозные баннеры:</strong> Top-Billboard 1200x120, боковые модули 300x600 в рейтингах и новостях.</span>
+            </li>
+            <li style="display: flex; gap: 8px;">
+              <span style="color: var(--primary); font-weight: 800;">✔</span>
+              <span><strong>Нативная аналитика:</strong> Экспертные обзоры ракеток, струн, кортов и падел-клубов от наших авторов.</span>
+            </li>
+            <li style="display: flex; gap: 8px;">
+              <span style="color: var(--primary); font-weight: 800;">✔</span>
+              <span><strong>Брендирование рубрик:</strong> Спонсорство виджета «Матчи сегодня» и раздела турниров Большого шлема.</span>
+            </li>
+            <li style="display: flex; gap: 8px;">
+              <span style="color: var(--primary); font-weight: 800;">✔</span>
+              <span><strong>Утренняя рассылка:</strong> Партнерские интеграции в ежедневный дайджест 8:00 МСК.</span>
+            </li>
+          </ul>
+
+          <div style="border-top: 1px solid #e2e8f0; padding-top: 16px;">
+            <h4 style="font-size: 0.9375rem; font-weight: 700; margin-bottom: 6px;">Режим работы редакции:</h4>
+            <p style="font-size: 0.8125rem; color: #64748b; line-height: 1.5;">
+              Понедельник — Воскресенье: круглосуточно (дежурная новостная служба). Ответ по рекламным запросам: в течение 2-4 часов в будние дни.
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,131 @@
+<%- include('./admin_layout_header', { 
+  adminTitle: isNew ? 'Новая новость' : 'Редактирование новости', 
+  activeTab: 'news', 
+  pageHeader: isNew ? 'Добавление новости вручную' : ('Редактирование новости: ' + newsItem.title),
+  stats: stats 
+}) %>
+
+<form action="<%= isNew ? '/admin/news/new' : ('/admin/news/edit/' + newsItem.id) %>" method="POST" id="newsEditorForm" enctype="multipart/form-data">
+  <div style="display: grid; grid-template-columns: 1fr 340px; gap: 24px; align-items: start;">
+    
+    <!-- Left Column: Title, Excerpt & WYSIWYG Content -->
+    <div>
+      <div class="admin-card">
+        <div class="form-group">
+          <label class="form-label">Заголовок новости (H1):</label>
+          <input type="text" name="title" class="form-control" value="<%= newsItem ? newsItem.title : '' %>" required placeholder="Например: Даниил Медведев победил в четвертьфинале">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Краткий анонс / лид (Excerpt):</label>
+          <textarea name="excerpt" class="form-control" rows="2" required placeholder="Краткое содержание новости"><%= newsItem ? newsItem.excerpt : '' %></textarea>
+        </div>
+
+        <div class="form-group">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <label class="form-label" style="margin: 0;">Полный текст новости (Визуальный WYSIWYG редактор):</label>
+            <button type="button" class="btn-admin btn-admin-secondary btn-admin-sm" id="toggleHtmlModeBtn">
+              &lt;/&gt; HTML код
+            </button>
+          </div>
+
+          <div class="wysiwyg-container">
+            <div class="wysiwyg-toolbar">
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="bold" title="Жирный"><b>B</b></button>
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="italic" title="Курсив"><i>I</i></button>
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="underline" title="Подчеркнутый"><u>U</u></button>
+              <div class="wysiwyg-divider"></div>
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="formatBlock" data-val="h2" title="H2">H2</button>
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="formatBlock" data-val="h3" title="H3">H3</button>
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="formatBlock" data-val="blockquote" title="Цитата">«»</button>
+              <div class="wysiwyg-divider"></div>
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="insertUnorderedList" title="Список">• Список</button>
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="createLink" title="Ссылка">🔗 Ссылка</button>
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="unlink" title="Снять ссылку">✂️</button>
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="insertImage" title="Картинка">🖼️ Картинка</button>
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="insertButton" title="Кнопка">🔘 Кнопка</button>
+              <button type="button" class="wysiwyg-btn js-wysiwyg-cmd" data-cmd="insertHtmlSnippet" title="HTML">&lt;HTML&gt;</button>
+            </div>
+
+            <div id="wysiwygEditorArea" class="wysiwyg-editor-area" contenteditable="true">
+              <%- newsItem ? newsItem.content : '<p>Введите текст новости...</p>' %>
+            </div>
+
+            <textarea id="wysiwygHtmlArea" class="wysiwyg-html-area"><%= newsItem ? newsItem.content : '<p>Введите текст новости...</p>' %></textarea>
+            <input type="hidden" name="content" id="contentHiddenInput" value="<%= newsItem ? newsItem.content : '' %>">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Category, Meta-tags & Image -->
+    <div>
+      <div class="admin-card">
+        <h3 class="admin-card-title" style="margin-bottom: 16px;">Параметры публикации</h3>
+
+        <div class="form-group">
+          <label class="form-label">Рубрика новости:</label>
+          <select name="category" class="form-control" required>
+            <option value="atp" <%= newsItem && newsItem.category === 'atp' ? 'selected' : '' %>>ATP Тур (Мужчины)</option>
+            <option value="wta" <%= newsItem && newsItem.category === 'wta' ? 'selected' : '' %>>WTA Тур (Женщины)</option>
+            <option value="grand-slam" <%= newsItem && newsItem.category === 'grand-slam' ? 'selected' : '' %>>Турниры Большого шлема</option>
+            <option value="team-russia" <%= newsItem && newsItem.category === 'team-russia' ? 'selected' : '' %>>Сборная России / РТТ</option>
+            <option value="padel-pickleball" <%= newsItem && newsItem.category === 'padel-pickleball' ? 'selected' : '' %>>Падел и Пиклбол</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">URL Slug (транслитерация):</label>
+          <input type="text" name="slug" class="form-control" value="<%= newsItem ? newsItem.slug : '' %>" required placeholder="medvedev-pobedil-v-finale">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Главная фотография (URL):</label>
+          <input type="text" name="image" class="form-control" value="<%= newsItem ? newsItem.image : '/images/news-medvedev.jpg' %>">
+          <input type="file" name="image_file" class="form-control" style="margin-top: 6px;" accept="image/*">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Источник (Атрибуция):</label>
+          <input type="text" name="source_name" class="form-control" value="<%= newsItem ? newsItem.source_name : 'Спорт-Экспресс / Редакция' %>">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Автор материала:</label>
+          <input type="text" name="author" class="form-control" value="<%= newsItem ? newsItem.author : 'Редакция Champion-Tennis.ru' %>">
+        </div>
+
+        <div class="form-group" style="display: flex; align-items: center; gap: 8px;">
+          <input type="checkbox" name="is_hot_24h" id="isHot24h" value="1" <%= newsItem && newsItem.is_hot_24h ? 'checked' : '' %>>
+          <label for="isHot24h" class="form-label" style="margin: 0; cursor: pointer;">
+            Показывать в блоке «Главное за 24 часа»
+          </label>
+        </div>
+
+        <hr style="border:0; border-top:1px solid var(--admin-border); margin: 16px 0;">
+
+        <h4 style="font-size: 0.9375rem; font-weight: 700; margin-bottom: 12px;">SEO Мета-теги</h4>
+
+        <div class="form-group">
+          <label class="form-label">Meta Title:</label>
+          <input type="text" name="meta_title" class="form-control" value="<%= newsItem ? newsItem.meta_title : '' %>">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Meta Description:</label>
+          <textarea name="meta_description" class="form-control" rows="3"><%= newsItem ? newsItem.meta_description : '' %></textarea>
+        </div>
+
+        <div style="margin-top: 24px; display: flex; flex-direction: column; gap: 10px;">
+          <button type="submit" class="btn-admin btn-admin-primary" style="justify-content: center; padding: 12px;">
+            💾 Опубликовать новость
+          </button>
+          <a href="/admin/news" class="btn-admin btn-admin-secondary" style="justify-content: center;">Отмена</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</form>
+
+<%- include('./admin_layout_footer') %>

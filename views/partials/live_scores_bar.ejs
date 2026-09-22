@@ -1,0 +1,25 @@
+<% if (typeof liveMatches !== 'undefined' && liveMatches && liveMatches.length > 0) { %>
+<div class="live-matches-strip">
+  <div class="container matches-strip-inner">
+    <div class="strip-label">
+      <span class="live-pill"></span>
+      <span>Матчи сегодня:</span>
+    </div>
+    <% liveMatches.forEach(function(m) { %>
+      <div class="match-strip-item" onclick="window.location.href='/tournaments'">
+        <div>
+          <div class="match-strip-tournament"><%= m.tournament_name %></div>
+          <div class="match-strip-players">
+            <span><%= m.player1_name %></span>
+            <span><%= m.player2_name %></span>
+          </div>
+        </div>
+        <div class="match-strip-score">
+          <div><%= m.score %></div>
+          <div style="font-size:0.65rem; color:<%= m.is_live ? '#ccff00' : '#94a3b8' %>;"><%= m.current_set %></div>
+        </div>
+      </div>
+    <% }); %>
+  </div>
+</div>
+<% } %>

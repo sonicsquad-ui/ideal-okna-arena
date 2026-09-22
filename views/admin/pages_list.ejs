@@ -1,0 +1,72 @@
+<%- include('./admin_layout_header', { 
+  adminTitle: 'Страницы сайта', 
+  activeTab: 'pages', 
+  pageHeader: 'Управление страницами сайта (Визуальный редактор, копирование, удаление)',
+  stats: stats 
+}) %>
+
+<div class="admin-card">
+  <div class="admin-card-header">
+    <h2 class="admin-card-title">Список всех страниц сайта</h2>
+    <a href="/admin/pages/new" class="btn-admin btn-admin-primary">
+      <span>+ Создать новую страницу</span>
+    </a>
+  </div>
+
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Название страницы</th>
+        <th>URL страницы (Slug)</th>
+        <th>Тип</th>
+        <th>Обновлено</th>
+        <th style="text-align: right;">Действия</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% pages.forEach(function(p) { %>
+        <tr>
+          <td>#<%= p.id %></td>
+          <td>
+            <strong><%= p.title %></strong>
+            <div style="font-size: 0.75rem; color: #64748b;"><%= p.meta_title %></div>
+          </td>
+          <td>
+            <a href="/<%= p.slug %>" target="_blank" style="color: var(--admin-primary); font-family: monospace;">
+              /<%= p.slug %> &nearr;
+            </a>
+          </td>
+          <td>
+            <span style="font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; font-weight: 700; background: <%= p.is_system ? '#e2e8f0' : '#dcfce7' %>; color: <%= p.is_system ? '#475569' : '#15803d' %>;">
+              <%= p.is_system ? 'Системная' : 'Пользовательская' %>
+            </span>
+          </td>
+          <td style="font-size: 0.8125rem; color: #64748b;"><%= p.updated_at %></td>
+          <td style="text-align: right; white-space: nowrap;">
+            <!-- Action Edit -->
+            <a href="/admin/pages/edit/<%= p.id %>" class="btn-admin btn-admin-primary btn-admin-sm">
+              ✏️ Редактор
+            </a>
+
+            <!-- Action Duplicate (Копирование) -->
+            <a href="/admin/pages/duplicate/<%= p.id %>" class="btn-admin btn-admin-secondary btn-admin-sm" title="Копировать страницу">
+              📋 Копия
+            </a>
+
+            <!-- Action Delete (not allowed for mandatory core system pages to prevent breaking) -->
+            <% if (!p.is_system) { %>
+              <form action="/admin/pages/delete/<%= p.id %>" method="POST" style="display: inline-block;" onsubmit="return confirm('Удалить эту страницу безвозвратно?');">
+                <button type="submit" class="btn-admin btn-admin-danger btn-admin-sm">
+                  🗑️
+                </button>
+              </form>
+            <% } %>
+          </td>
+        </tr>
+      <% }); %>
+    </tbody>
+  </table>
+</div>
+
+<%- include('./admin_layout_footer') %>

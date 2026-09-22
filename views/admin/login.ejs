@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Вход в панель управления — Champion-Tennis.ru</title>
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-body admin-login-wrap">
+  <div class="admin-login-card">
+    <div class="login-brand">
+      <div style="width: 48px; height: 48px; background: #0a5c36; border-radius: 12px; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; color: #ccff00;">
+        <svg style="width: 28px; height: 28px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10" stroke="#ccff00"/>
+          <path d="M4.93 4.93c4.2 4.2 4.2 10.94 0 15.14" stroke="#ffffff"/>
+          <path d="M19.07 4.93c-4.2 4.2-4.2 10.94 0 15.14" stroke="#ffffff"/>
+        </svg>
+      </div>
+      <h1>Чемпион-Теннис</h1>
+      <p>Административная панель портала champion-tennis.ru</p>
+    </div>
+
+    <% if (typeof error !== 'undefined' && error) { %>
+      <div class="alert alert-danger"><%= error %></div>
+    <% } %>
+
+    <form action="/admin/login" method="POST">
+      <div class="form-group">
+        <label class="form-label">Логин администратора:</label>
+        <input type="text" name="username" class="form-control" required autocomplete="username" placeholder="admin" autofocus>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Пароль:</label>
+        <input type="password" name="password" class="form-control" required autocomplete="current-password" placeholder="••••••••••••">
+      </div>
+
+      <button type="submit" class="btn-admin btn-admin-primary" style="width: 100%; justify-content: center; padding: 12px; font-size: 1rem; margin-top: 10px;">
+        Войти в систему &rarr;
+      </button>
+    </form>
+
+    <div style="text-align: center; margin-top: 20px;">
+      <a href="/" style="font-size: 0.8125rem; color: #64748b; text-decoration: none;">&larr; Вернуться на главный сайт</a>
+    </div>
+  </div>
+</body>
+</html>

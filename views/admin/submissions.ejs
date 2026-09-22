@@ -1,0 +1,71 @@
+<%- include('./admin_layout_header', { 
+  adminTitle: 'Заявки с форм сайта', 
+  activeTab: 'submissions', 
+  pageHeader: 'Входящие заявки, обращения и подписки на рассылку',
+  stats: stats 
+}) %>
+
+<div class="admin-card">
+  <div class="admin-card-header">
+    <div>
+      <h2 class="admin-card-title">Журнал всех заявок с форм (<%= submissions.length %>)</h2>
+      <p style="font-size: 0.8125rem; color: #64748b; margin-top: 2px;">
+        Каждая заявка автоматически дублируется на почту администратора <strong>sonicsquad@mail.ru</strong> (на самом сайте адрес скрыт от спам-ботов).
+      </p>
+    </div>
+  </div>
+
+  <% if (submissions.length === 0) { %>
+    <div style="padding: 40px; text-align: center; color: #64748b;">
+      Пока нет входящих заявок.
+    </div>
+  <% } else { %>
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Дата и время</th>
+          <th>Тип формы</th>
+          <th>Имя</th>
+          <th>Контактные данные</th>
+          <th>Тема / Запрос</th>
+          <th>Страница отправки</th>
+          <th>Маршрутизация почты</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% submissions.forEach(function(sub) { %>
+          <tr>
+            <td>#<%= sub.id %></td>
+            <td style="font-size: 0.8125rem; white-space: nowrap;"><%= sub.created_at %></td>
+            <td>
+              <span style="font-size: 0.75rem; padding: 3px 8px; border-radius: 4px; font-weight: 700; background: <%= sub.form_type === 'newsletter' ? '#e0f2fe' : '#fef3c7' %>; color: <%= sub.form_type === 'newsletter' ? '#0369a1' : '#b45309' %>;">
+                <%= sub.form_type %>
+              </span>
+            </td>
+            <td><strong><%= sub.name || 'Подписчик' %></strong></td>
+            <td><code style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px;"><%= sub.contact_info %></code></td>
+            <td>
+              <strong><%= sub.subject || '—' %></strong>
+              <% if (sub.message) { %>
+                <div style="font-size: 0.775rem; color: #64748b; margin-top: 4px; max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                  <%= sub.message %>
+                </div>
+              <% } %>
+            </td>
+            <td style="font-size: 0.75rem; color: #94a3b8; max-width: 150px; overflow: hidden; text-overflow: ellipsis;">
+              <%= sub.source_url || '—' %>
+            </td>
+            <td>
+              <span style="color: #16a34a; font-weight: 700; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 4px;">
+                ✔ Отправлено на sonicsquad@mail.ru
+              </span>
+            </td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  <% } %>
+</div>
+
+<%- include('./admin_layout_footer') %>

@@ -1,0 +1,294 @@
+<%- include('../partials/head') %>
+<%- include('../partials/header', { activeNav: 'home', activeCategory: 'all' }) %>
+<%- include('../partials/live_scores_bar') %>
+
+<main class="page-main">
+  <div class="container">
+
+    <!-- 1. SXO-элемент: Блок «Матчи сегодня» (Live-результаты и расписание на день) -->
+    <section class="matches-today-card" aria-label="Матчи сегодня и Live результаты">
+      <div class="section-title-bar" style="padding: 16px 20px 12px; margin-bottom: 0;">
+        <h2 class="section-heading" style="font-size: 1.15rem;">
+          <span class="live-pill"></span>
+          <span>Матчи сегодня: Live-результаты и расписание</span>
+        </h2>
+        <div class="matches-tabs">
+          <button class="match-tab-btn active" data-filter="all">Все матчи</button>
+          <button class="match-tab-btn" data-filter="live">🔴 Только LIVE</button>
+          <button class="match-tab-btn" data-filter="finished">Завершенные</button>
+          <button class="match-tab-btn" data-filter="soon">Предстоящие</button>
+        </div>
+      </div>
+
+      <div class="match-items-list" id="matchesListContainer">
+        <% liveMatches.forEach(function(m) { %>
+          <div class="match-row-item" data-status="<%= m.is_live ? 'live' : (m.status === 'ЗАВЕРШЕН' ? 'finished' : 'soon') %>">
+            <div class="match-status-col">
+              <span class="status-badge <%= m.is_live ? 'live' : (m.status === 'ЗАВЕРШЕН' ? 'finished' : 'soon') %>">
+                <%= m.is_live ? '● LIVE' : m.status %>
+              </span>
+              <div class="match-tourn-name" title="<%= m.tournament_name %>"><%= m.tournament_name %></div>
+              <div style="font-size:0.7rem; color:#94a3b8;"><%= m.surface %> • <%= m.court %></div>
+            </div>
+
+            <div class="match-competitors-col">
+              <div class="player-line">
+                <div class="player-info">
+                  <span style="font-weight:700; color:<%= m.player1_country === 'RUS' ? '#dc2626' : '#0f172a' %>;">
+                    <%= m.player1_name %>
+                  </span>
+                  <span style="font-size:0.75rem; color:#64748b;">(<%= m.player1_country %>, №<%= m.player1_rank %>)</span>
+                </div>
+              </div>
+              <div class="player-line">
+                <div class="player-info">
+                  <span style="font-weight:700; color:<%= m.player2_country === 'RUS' ? '#dc2626' : '#0f172a' %>;">
+                    <%= m.player2_name %>
+                  </span>
+                  <span style="font-size:0.75rem; color:#64748b;">(<%= m.player2_country %>, №<%= m.player2_rank %>)</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="match-score-col">
+              <div><%= m.score %></div>
+              <% if (m.current_set) { %>
+                <div class="match-set-detail"><%= m.current_set %></div>
+              <% } %>
+            </div>
+          </div>
+        <% }); %>
+      </div>
+    </section>
+
+    <!-- Main Content Area: Left Column (Feed) + Right Column (Rankings & CTA) -->
+    <div class="home-grid">
+      <div class="home-primary-col">
+        
+        <!-- 2. SXO-элемент: Лента «Главное за 24 часа» (топ-3 новости с крупными превью + кнопка "Все новости") -->
+        <section style="margin-bottom: 36px;">
+          <div class="section-title-bar">
+            <h2 class="section-heading">
+              <span class="heading-bar"></span>
+              <span>Главное за 24 часа</span>
+            </h2>
+            <a href="/news" class="view-all-link">
+              <span>Все новости</span>
+              <svg style="width:16px; height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
+            </a>
+          </div>
+
+          <div class="top24-grid">
+            <% top24News.forEach(function(item) { %>
+              <article class="news-card-featured">
+                <a href="/news/<%= item.category %>/<%= item.slug %>" class="news-card-img-wrap">
+                  <img src="<%= item.image || '/images/hero-tennis-ball.jpg' %>" alt="<%= item.title %>" loading="lazy">
+                  <span class="category-tag <%= item.category %>">
+                    <%= item.category === 'atp' ? 'ATP Тур' : (item.category === 'wta' ? 'WTA Тур' : (item.category === 'grand-slam' ? 'Большой шлем' : (item.category === 'team-russia' ? 'Сборная РФ' : 'Падел'))) %>
+                  </span>
+                </a>
+                <div class="news-card-body">
+                  <div class="news-meta-row">
+                    <span>⏱️ <%= item.published_at_formatted %></span>
+                    <span>👁️ <%= item.views %></span>
+                  </div>
+                  <h3 class="news-card-title">
+                    <a href="/news/<%= item.category %>/<%= item.slug %>"><%= item.title %></a>
+                  </h3>
+                  <p class="news-card-excerpt"><%= item.excerpt %></p>
+                  <div class="news-card-footer">
+                    <span><%= item.source_name %></span>
+                    <a href="/news/<%= item.category %>/<%= item.slug %>" style="color:var(--primary); font-weight:700;">Читать &rarr;</a>
+                  </div>
+                </div>
+              </article>
+            <% }); %>
+          </div>
+        </section>
+
+        <!-- 3. SXO-элемент: Блок «Выбор редакции» (глубокая аналитика или эксклюзив - последние 3 статьи блога) -->
+        <section style="margin-bottom: 36px;">
+          <div class="section-title-bar">
+            <h2 class="section-heading">
+              <span class="heading-bar" style="background:var(--accent-clay);"></span>
+              <span>Выбор редакции: Аналитика и Эксклюзивы</span>
+            </h2>
+            <a href="/blog" class="view-all-link" style="color:var(--accent-clay);">
+              <span>В блог редакции</span>
+              <svg style="width:16px; height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
+            </a>
+          </div>
+
+          <div class="editors-choice-grid">
+            <% editorsArticles.forEach(function(art) { %>
+              <article class="editors-card">
+                <a href="/blog/<%= art.category %>/<%= art.slug %>">
+                  <img src="<%= art.image || '/images/blog-tactics.jpg' %>" alt="<%= art.title %>" class="editors-img" loading="lazy">
+                </a>
+                <div class="editors-body">
+                  <div class="editors-author">
+                    <img src="<%= art.author_avatar || '/images/author-coach.jpg' %>" alt="<%= art.author_name %>">
+                    <div>
+                      <div><%= art.author_name %></div>
+                      <div style="font-size:0.7rem; color:#94a3b8;"><%= art.reading_time %> мин чтения</div>
+                    </div>
+                  </div>
+                  <h3 class="editors-title">
+                    <a href="/blog/<%= art.category %>/<%= art.slug %>"><%= art.title %></a>
+                  </h3>
+                  <p class="editors-snippet"><%= art.excerpt %></p>
+                  <a href="/blog/<%= art.category %>/<%= art.slug %>" class="btn-read-more">
+                    <span>Читать далее</span>
+                    <svg style="width:14px; height:14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                  </a>
+                </div>
+              </article>
+            <% }); %>
+          </div>
+
+          <div style="text-align: center; margin-top: 10px;">
+            <a href="/blog" class="btn-admin btn-admin-primary" style="padding: 12px 28px; font-size: 0.9375rem;">
+              <span>Читать еще в блоге аналитики &rarr;</span>
+            </a>
+          </div>
+        </section>
+
+        <!-- 4. Дополнительный блок: Российские звезды в Туре -->
+        <section style="margin-bottom: 36px; background: white; padding: 24px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+          <div class="section-title-bar" style="margin-bottom: 16px;">
+            <h2 class="section-heading" style="font-size: 1.15rem;">
+              <span>🇷🇺 Российские лидеры мирового тура</span>
+            </h2>
+            <a href="/players" class="view-all-link">Все игроки &rarr;</a>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+            <% russianStars.forEach(function(p) { %>
+              <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
+                <img src="<%= p.image %>" alt="<%= p.name %>" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover;">
+                <div>
+                  <div style="font-weight: 700; font-size: 0.9375rem;">
+                    <a href="/players/<%= p.slug %>" style="color:var(--text-main);"><%= p.name %></a>
+                  </div>
+                  <div style="font-size: 0.75rem; color: #64748b;">
+                    Рейтинг: <strong>№<%= p.rank %></strong> (<%= p.points %> очков)
+                  </div>
+                </div>
+              </div>
+            <% }); %>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- Right Column: Rankings Widget, CTA & Quick Links -->
+      <aside class="home-sidebar-col">
+        
+        <!-- 5. SXO-элемент: Виджет «Рейтинг ATP / WTA: Топ-5» (с динамическим обновлением) -->
+        <div class="sidebar-box" aria-label="Рейтинги ATP и WTA Топ-5">
+          <div class="sidebar-box-header">
+            <h3 class="sidebar-box-title">
+              <svg style="width:18px; height:18px; color:var(--accent-gold);" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+              <span>Рейтинг: Топ-5</span>
+            </h3>
+            <div class="rankings-tab-bar">
+              <button class="rank-tab-btn active" data-tab="atp">ATP</button>
+              <button class="rank-tab-btn" data-tab="wta">WTA</button>
+            </div>
+          </div>
+
+          <!-- ATP Top-5 List -->
+          <div class="rankings-list" id="rankingsAtpList">
+            <% top5Atp.forEach(function(item) { %>
+              <div class="rank-item">
+                <span class="rank-number">#<%= item.rank %></span>
+                <div class="rank-player-col">
+                  <span><%= item.flag %></span>
+                  <a href="/players/<%= item.slug %>" style="color:var(--text-main);"><%= item.name %></a>
+                </div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span class="rank-points"><%= item.points %></span>
+                  <span class="rank-diff <%= item.rank_change > 0 ? 'up' : (item.rank_change < 0 ? 'down' : 'same') %>">
+                    <%= item.rank_change > 0 ? '+' + item.rank_change : (item.rank_change < 0 ? item.rank_change : '—') %>
+                  </span>
+                </div>
+              </div>
+            <% }); %>
+            <div style="padding: 12px 0 4px; text-align: center;">
+              <a href="/rankings" style="font-size: 0.8125rem; font-weight: 700; color: var(--primary);">
+                Полная таблица ATP (Топ-100) &rarr;
+              </a>
+            </div>
+          </div>
+
+          <!-- WTA Top-5 List -->
+          <div class="rankings-list" id="rankingsWtaList" style="display: none;">
+            <% top5Wta.forEach(function(item) { %>
+              <div class="rank-item">
+                <span class="rank-number">#<%= item.rank %></span>
+                <div class="rank-player-col">
+                  <span><%= item.flag %></span>
+                  <a href="/players/<%= item.slug %>" style="color:var(--text-main);"><%= item.name %></a>
+                </div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span class="rank-points"><%= item.points %></span>
+                  <span class="rank-diff <%= item.rank_change > 0 ? 'up' : (item.rank_change < 0 ? 'down' : 'same') %>">
+                    <%= item.rank_change > 0 ? '+' + item.rank_change : (item.rank_change < 0 ? item.rank_change : '—') %>
+                  </span>
+                </div>
+              </div>
+            <% }); %>
+            <div style="padding: 12px 0 4px; text-align: center;">
+              <a href="/rankings?type=wta" style="font-size: 0.8125rem; font-weight: 700; color: #9333ea;">
+                Полная таблица WTA (Топ-100) &rarr;
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. SXO-элемент: Четкий CTA (Call to Action) «Подписаться на ежедневную теннисную рассылку» -->
+        <div class="cta-newsletter-card" style="margin-top: 0;">
+          <div class="cta-content">
+            <h3 class="cta-title">Теннисный дайджест 8:00 МСК</h3>
+            <p class="cta-subtitle">
+              Утренняя сводка: счета ночных матчей, свежие новости, расклады сетки и аналитика от экспертов «Чемпион-Теннис».
+            </p>
+            <form class="cta-form js-newsletter-form">
+              <input type="email" class="cta-input" placeholder="Введите ваш e-mail" required>
+              <button type="submit" class="btn-cta-submit">Подписаться</button>
+            </form>
+            <p class="cta-privacy-note">
+              Без спама. Отписаться можно в 1 клик. Ваши данные защищены <a href="/privacy-policy">152-ФЗ</a>.
+            </p>
+          </div>
+        </div>
+
+        <!-- 7. Быстрый блок: Популярные темы и Экипировка -->
+        <div class="sidebar-box">
+          <div class="sidebar-box-header">
+            <h3 class="sidebar-box-title">
+              <span>🎾 Гид по экипировке 2026</span>
+            </h3>
+          </div>
+          <div style="padding: 16px;">
+            <p style="font-size: 0.84rem; color: #64748b; margin-bottom: 12px;">
+              Подберите оптимальную ракетку под ваш стиль игры и уровень подготовки.
+            </p>
+            <a href="/gear" style="display: block; font-weight: 700; color: var(--primary); font-size: 0.875rem; margin-bottom: 8px;">
+              • Рейтинг ракеток Head, Wilson, Babolat 2026 &rarr;
+            </a>
+            <a href="/gear" style="display: block; font-weight: 700; color: var(--primary); font-size: 0.875rem; margin-bottom: 8px;">
+              • Профилактика «теннисного локтя» и упражнения &rarr;
+            </a>
+            <a href="/news/padel-pickleball" style="display: block; font-weight: 700; color: #059669; font-size: 0.875rem;">
+              • Как начать играть в Падел: гид новичка &rarr;
+            </a>
+          </div>
+        </div>
+
+      </aside>
+    </div>
+
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

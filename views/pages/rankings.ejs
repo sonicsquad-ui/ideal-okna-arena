@@ -1,0 +1,129 @@
+<%- include('../partials/head', { title: 'Мировые рейтинги ATP и WTA — Чемпион-Теннис' }) %>
+<%- include('../partials/header', { activeNav: 'rankings' }) %>
+<%- include('../partials/breadcrumbs', { breadcrumbs: breadcrumbs }) %>
+
+<main class="page-main">
+  <div class="container">
+    
+    <div class="section-title-bar" style="margin-bottom: 24px;">
+      <div>
+        <h1 class="section-heading" style="font-size: 1.75rem;">
+          <span class="heading-bar"></span>
+          <span>Официальные рейтинги ATP и WTA</span>
+        </h1>
+        <p style="font-size: 0.875rem; color: #64748b; margin-top: 4px;">
+          Актуальная табель о рангах мужской и женской профессиональных ассоциаций. Обновление по понедельникам после завершения турниров.
+        </p>
+      </div>
+
+      <!-- Tab toggle ATP / WTA -->
+      <div style="display: flex; gap: 6px; background: #e2e8f0; padding: 4px; border-radius: 8px;">
+        <a href="/rankings?type=atp" class="subnav-item <%= currentType === 'atp' ? 'active' : '' %>" style="padding: 6px 16px; font-weight: 700;">
+          Рейтинг ATP (Мужчины)
+        </a>
+        <a href="/rankings?type=wta" class="subnav-item <%= currentType === 'wta' ? 'active' : '' %>" style="padding: 6px 16px; font-weight: 700;">
+          Рейтинг WTA (Женщины)
+        </a>
+      </div>
+    </div>
+
+    <!-- Rankings Table -->
+    <div class="data-table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width: 50px;">Место</th>
+            <th style="width: 40px;">+/-</th>
+            <th>Игрок</th>
+            <th>Страна</th>
+            <th>Возраст</th>
+            <th>Очки</th>
+            <th>Титулы</th>
+            <th>Шлемы</th>
+            <th>Профиль игрока</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% playersList.forEach(function(p) { %>
+            <tr>
+              <td>
+                <strong style="font-size: 1rem; color: <%= p.rank <= 3 ? 'var(--primary)' : '#0f172a' %>;">
+                  #<%= p.rank %>
+                </strong>
+              </td>
+              <td>
+                <span class="rank-diff <%= p.rank_change > 0 ? 'up' : (p.rank_change < 0 ? 'down' : 'same') %>">
+                  <%= p.rank_change > 0 ? '+' + p.rank_change : (p.rank_change < 0 ? p.rank_change : '=') %>
+                </span>
+              </td>
+              <td>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <img src="<%= p.image %>" alt="<%= p.name %>" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;">
+                  <div>
+                    <a href="/players/<%= p.slug %>" style="font-weight: 700; color: var(--text-main); font-size: 0.9375rem;">
+                      <%= p.name %>
+                    </a>
+                    <div style="font-size: 0.725rem; color: #94a3b8;"><%= p.name_en %></div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <span style="display: inline-flex; align-items: center; gap: 6px; font-weight: 600;">
+                  <span><%= p.flag %></span>
+                  <span><%= p.country %></span>
+                </span>
+              </td>
+              <td><%= p.age %> лет</td>
+              <td>
+                <strong style="color: var(--primary-dark); font-variant-numeric: tabular-nums; font-size: 1rem;">
+                  <%= p.points %>
+                </strong>
+              </td>
+              <td style="font-weight: 600;"><%= p.titles %></td>
+              <td>
+                <% if (p.grand_slams > 0) { %>
+                  <span style="background: #fef3c7; color: #b45309; font-weight: 800; font-size: 0.75rem; padding: 2px 8px; border-radius: 4px;">
+                    🏆 <%= p.grand_slams %>
+                  </span>
+                <% } else { %>
+                  <span style="color: #94a3b8;">0</span>
+                <% } %>
+              </td>
+              <td>
+                <a href="/players/<%= p.slug %>" class="btn-admin btn-admin-secondary btn-admin-sm">
+                  Досье &rarr;
+                </a>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- History / E-E-A-T Hall of fame banner («Эпоха классицизма» gotennis.ru style) -->
+    <div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; border-radius: 12px; padding: 32px; margin-top: 40px; display: grid; grid-template-columns: 1fr 280px; gap: 28px; align-items: center;">
+      <div>
+        <span style="background: var(--accent-clay); color: white; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; padding: 3px 8px; border-radius: 4px;">
+          Зал славы и Эпоха классицизма
+        </span>
+        <h2 style="font-size: 1.625rem; font-weight: 800; margin: 12px 0 8px;">
+          Легенды мирового и отечественного тенниса
+        </h2>
+        <p style="color: #cbd5e1; font-size: 0.9375rem; line-height: 1.6;">
+          Погрузитесь в историю великих побед: триумфы Марата Сафина и Евгения Кафельникова, эпоха доминирования «Большой тройки» (Федерер, Надаль, Джокович) и победы Марии Шараповой и Анастасии Мыскиной на кортах Большого шлема.
+        </p>
+        <div style="margin-top: 18px;">
+          <a href="/blog/reviews/istoricheskie-ocherki-legendarnye-matchi-proshlogo-federer-nadal-safin" class="btn-admin btn-admin-primary" style="padding: 10px 20px;">
+            <span>Читать исторические очерки &rarr;</span>
+          </a>
+        </div>
+      </div>
+      <div>
+        <img src="/images/legendary-match.jpg" alt="Легенды тенниса" style="border-radius: 8px; width: 100%; aspect-ratio: 16/10; object-fit: cover;">
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

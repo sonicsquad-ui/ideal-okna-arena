@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof adminTitle !== 'undefined' ? adminTitle : 'Панель управления' %> — Champion-Tennis.ru</title>
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-body">
+
+<!-- Admin Sidebar -->
+<aside class="admin-sidebar">
+  <div class="admin-sidebar-header">
+    <a href="/admin" class="admin-brand">
+      <svg style="width:24px; height:24px; color:#ccff00;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10" stroke="#ccff00"/>
+        <path d="M4.93 4.93c4.2 4.2 4.2 10.94 0 15.14" stroke="#ffffff"/>
+      </svg>
+      <span>Чемпион-Теннис</span>
+    </a>
+  </div>
+
+  <nav class="admin-nav">
+    <a href="/admin" class="admin-nav-item <%= typeof activeTab !== 'undefined' && activeTab === 'dashboard' ? 'active' : '' %>">
+      <svg style="width:18px; height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+      <span>Сводка (Дашборд)</span>
+    </a>
+
+    <a href="/admin/pages" class="admin-nav-item <%= typeof activeTab !== 'undefined' && activeTab === 'pages' ? 'active' : '' %>">
+      <svg style="width:18px; height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+      <span>Страницы сайта</span>
+      <span class="admin-badge-count"><%= typeof stats !== 'undefined' ? stats.pagesCount : '' %></span>
+    </a>
+
+    <a href="/admin/blog" class="admin-nav-item <%= typeof activeTab !== 'undefined' && activeTab === 'blog' ? 'active' : '' %>">
+      <svg style="width:18px; height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
+      <span>Статьи блога</span>
+      <span class="admin-badge-count"><%= typeof stats !== 'undefined' ? stats.articlesCount : '' %></span>
+    </a>
+
+    <a href="/admin/news" class="admin-nav-item <%= typeof activeTab !== 'undefined' && activeTab === 'news' ? 'active' : '' %>">
+      <svg style="width:18px; height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
+      <span>Новости и Агрегатор</span>
+      <span class="admin-badge-count"><%= typeof stats !== 'undefined' ? stats.newsCount : '' %></span>
+    </a>
+
+    <a href="/admin/global-blocks" class="admin-nav-item <%= typeof activeTab !== 'undefined' && activeTab === 'global_blocks' ? 'active' : '' %>">
+      <svg style="width:18px; height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+      <span>Шапка, Футер и Блоки</span>
+    </a>
+
+    <a href="/admin/submissions" class="admin-nav-item <%= typeof activeTab !== 'undefined' && activeTab === 'submissions' ? 'active' : '' %>">
+      <svg style="width:18px; height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+      <span>Заявки с форм</span>
+      <span class="admin-badge-count" style="background:#10b981;"><%= typeof stats !== 'undefined' ? stats.submissionsCount : '' %></span>
+    </a>
+
+    <hr style="border:0; border-top:1px solid #1e293b; margin:10px 0;">
+
+    <a href="/" target="_blank" class="admin-nav-item">
+      <svg style="width:18px; height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+      <span>Открыть сайт (в новой вкладке)</span>
+    </a>
+  </nav>
+
+  <div class="admin-sidebar-footer">
+    <div>
+      <div style="font-weight:700; color:white;">Администратор</div>
+      <div style="color:#64748b; font-size:0.7rem;">champion-tennis.ru</div>
+    </div>
+    <a href="/admin/logout" class="admin-logout-btn" title="Выйти из админки">Выход</a>
+  </div>
+</aside>
+
+<!-- Admin Main Container -->
+<div class="admin-main">
+  <header class="admin-topbar">
+    <h1 class="admin-page-title"><%= typeof pageHeader !== 'undefined' ? pageHeader : 'Панель управления' %></h1>
+    <div class="admin-topbar-actions">
+      <span style="font-size:0.8125rem; color:#64748b;">Дата: 22.09.2026 (МСК)</span>
+      <a href="/admin/pages/new" class="btn-admin btn-admin-primary btn-admin-sm">+ Создать страницу</a>
+      <a href="/admin/blog/new" class="btn-admin btn-admin-warning btn-admin-sm">+ Новая статья</a>
+    </div>
+  </header>
+
+  <main class="admin-content">

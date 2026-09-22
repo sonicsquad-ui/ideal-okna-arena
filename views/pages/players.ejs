@@ -1,0 +1,164 @@
+<%- include('../partials/head', { title: 'Игроки мирового тура и Сборной России — Чемпион-Теннис' }) %>
+<%- include('../partials/header', { activeNav: 'players' }) %>
+<%- include('../partials/breadcrumbs', { breadcrumbs: breadcrumbs }) %>
+
+<main class="page-main">
+  <div class="container">
+    
+    <div class="section-title-bar" style="margin-bottom: 24px;">
+      <div>
+        <h1 class="section-heading" style="font-size: 1.75rem;">
+          <span class="heading-bar"></span>
+          <span>Профили игроков, Статистика и H2H сравнение</span>
+        </h1>
+        <p style="font-size: 0.875rem; color: #64748b; margin-top: 4px;">
+          Детальные досье спортсменов ATP и WTA, биометрия, стиль игры, карьерные титулы и история личных встреч (Head-to-Head).
+        </p>
+      </div>
+
+      <!-- Quick Gender Filter -->
+      <div style="display: flex; gap: 8px;">
+        <button class="subnav-item active" onclick="filterPlayers('all', this)">Все игроки</button>
+        <button class="subnav-item" onclick="filterPlayers('M', this)">ATP (Мужчины)</button>
+        <button class="subnav-item" onclick="filterPlayers('F', this)">WTA (Женщины)</button>
+        <button class="subnav-item" onclick="filterPlayers('RUS', this)">🇷🇺 Россия</button>
+      </div>
+    </div>
+
+    <!-- Interactive H2H Head-to-Head Comparison Tool -->
+    <section style="background: white; border-radius: 12px; border: 1px solid var(--border); padding: 24px; margin-bottom: 36px; box-shadow: var(--shadow-sm);">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+        <h2 style="font-size: 1.25rem; font-weight: 800; color: var(--text-main);">
+          ⚡ Интерактивный H2H калькулятор (Сравнение соперников)
+        </h2>
+        <span style="font-size: 0.75rem; background: var(--primary-subtle); color: var(--primary); padding: 3px 8px; border-radius: 4px; font-weight: 700;">
+          Очные встречи
+        </span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: center;">
+        <div>
+          <label style="font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 4px; display: block;">Первый игрок:</label>
+          <select id="h2hPlayer1" class="form-control" onchange="runH2HCompare()">
+            <% players.forEach(function(p) { %>
+              <option value="<%= p.slug %>" <%= p.slug === 'daniil-medvedev' ? 'selected' : '' %>><%= p.name %> (<%= p.country %>)</option>
+            <% }); %>
+          </select>
+        </div>
+
+        <div style="font-size: 1.25rem; font-weight: 900; color: var(--accent-clay); text-align: center; padding-top: 18px;">
+          VS
+        </div>
+
+        <div>
+          <label style="font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 4px; display: block;">Второй игрок:</label>
+          <select id="h2hPlayer2" class="form-control" onchange="runH2HCompare()">
+            <% players.forEach(function(p) { %>
+              <option value="<%= p.slug %>" <%= p.slug === 'jannik-sinner' ? 'selected' : '' %>><%= p.name %> (<%= p.country %>)</option>
+            <% }); %>
+          </select>
+        </div>
+      </div>
+
+      <!-- H2H Comparison Result Display -->
+      <div id="h2hResultBox" style="margin-top: 20px; padding: 18px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-around; flex-wrap: wrap; gap: 16px;">
+        <div style="text-align: center;">
+          <div id="h2hP1Name" style="font-weight: 800; font-size: 1.15rem; color: var(--text-main);">Даниил Медведев</div>
+          <div style="font-size: 0.8125rem; color: #64748b;">Рейтинг: №4 • Очки: 6850</div>
+        </div>
+        <div style="text-align: center;">
+          <div style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: #64748b;">Баланс побед</div>
+          <div id="h2hScoreBoard" style="font-size: 2rem; font-weight: 900; color: var(--primary); letter-spacing: 2px;">7 : 7</div>
+          <div style="font-size: 0.75rem; color: #10b981; font-weight: 700;">Боевой паритет</div>
+        </div>
+        <div style="text-align: center;">
+          <div id="h2hP2Name" style="font-weight: 800; font-size: 1.15rem; color: var(--text-main);">Янник Синнер</div>
+          <div style="font-size: 0.8125rem; color: #64748b;">Рейтинг: №1 • Очки: 10480</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Players Cards Grid -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px;">
+      <% players.forEach(function(p) { %>
+        <div class="player-catalog-card" data-gender="<%= p.gender %>" data-country="<%= p.country_code %>" style="background: white; border-radius: 12px; border: 1px solid var(--border); overflow: hidden; box-shadow: var(--shadow-sm); display: flex; flex-direction: column;">
+          <div style="position: relative; aspect-ratio: 1 / 1; overflow: hidden; background: #0f172a;">
+            <img src="<%= p.image %>" alt="<%= p.name %>" style="width: 100%; height: 100%; object-fit: cover;">
+            <span style="position: absolute; top: 12px; left: 12px; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); color: white; font-weight: 800; font-size: 0.8125rem; padding: 4px 10px; border-radius: 6px;">
+              #<%= p.rank %> в мире
+            </span>
+            <span style="position: absolute; bottom: 12px; right: 12px; font-size: 1.5rem;">
+              <%= p.flag %>
+            </span>
+          </div>
+
+          <div style="padding: 18px; display: flex; flex-direction: column; flex: 1;">
+            <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 2px;">
+              <a href="/players/<%= p.slug %>" style="color: var(--text-main);"><%= p.name %></a>
+            </h3>
+            <div style="font-size: 0.775rem; color: #64748b; margin-bottom: 12px;"><%= p.name_en %></div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.8125rem; background: #f8fafc; padding: 10px; border-radius: 6px; margin-bottom: 14px;">
+              <div>Возраст: <strong><%= p.age %></strong></div>
+              <div>Рост: <strong><%= p.height %> см</strong></div>
+              <div>Титулы: <strong><%= p.titles %></strong></div>
+              <div>Очки: <strong style="color:var(--primary);"><%= p.points %></strong></div>
+            </div>
+
+            <p style="font-size: 0.8125rem; color: #475569; line-height: 1.5; margin-bottom: 16px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; flex: 1;">
+              <%= p.bio %>
+            </p>
+
+            <a href="/players/<%= p.slug %>" class="btn-admin btn-admin-primary" style="justify-content: center;">
+              <span>Полное досье и цитаты &rarr;</span>
+            </a>
+          </div>
+        </div>
+      <% }); %>
+    </div>
+
+  </div>
+</main>
+
+<script>
+function filterPlayers(type, btn) {
+  document.querySelectorAll('.subnav-item').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  const cards = document.querySelectorAll('.player-catalog-card');
+  cards.forEach(c => {
+    const g = c.dataset.gender;
+    const cntry = c.dataset.country;
+    if (type === 'all' || (type === 'RUS' && cntry === 'RUS') || g === type) {
+      c.style.display = 'flex';
+    } else {
+      c.style.display = 'none';
+    }
+  });
+}
+
+function runH2HCompare() {
+  const p1 = document.getElementById('h2hPlayer1').value;
+  const p2 = document.getElementById('h2hPlayer2').value;
+  const p1Text = document.getElementById('h2hPlayer1').selectedOptions[0].text;
+  const p2Text = document.getElementById('h2hPlayer2').selectedOptions[0].text;
+
+  document.getElementById('h2hP1Name').textContent = p1Text;
+  document.getElementById('h2hP2Name').textContent = p2Text;
+
+  // Realistic synthetic H2H generator based on pairings
+  let score = '2 : 2';
+  if ((p1.includes('medvedev') && p2.includes('sinner')) || (p2.includes('medvedev') && p1.includes('sinner'))) {
+    score = '7 : 7';
+  } else if ((p1.includes('medvedev') && p2.includes('alcaraz')) || (p2.includes('medvedev') && p1.includes('alcaraz'))) {
+    score = '2 : 5';
+  } else if ((p1.includes('andreeva') && p2.includes('sabalenka')) || (p2.includes('andreeva') && p1.includes('sabalenka'))) {
+    score = '1 : 3';
+  } else if (p1 === p2) {
+    score = '— : —';
+  }
+  document.getElementById('h2hScoreBoard').textContent = score;
+}
+</script>
+
+<%- include('../partials/footer') %>

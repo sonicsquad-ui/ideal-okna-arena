@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'Чемпион-Теннис | Новости, Рейтинги и Аналитика' %></title>
+  
+  <meta name="description" content="<%= typeof meta_description !== 'undefined' && meta_description ? meta_description : 'Портал «Чемпион-Теннис» (champion-tennis.ru) — оперативные новости спорта и тенниса, результаты матчей, рейтинги ATP и WTA, турнирный календарь, блог и обзоры экипировки.' %>">
+  <meta name="keywords" content="<%= typeof meta_keywords !== 'undefined' && meta_keywords ? meta_keywords : 'теннис, новости тенниса, рейтинг atp, рейтинг wta, медведев, рублев, андреева, турниры большого шлема, падел, экипировка' %>">
+  
+  <!-- Open Graph / SEO -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="<%= typeof title !== 'undefined' ? title : 'Чемпион-Теннис' %>">
+  <meta property="og:description" content="<%= typeof meta_description !== 'undefined' && meta_description ? meta_description : 'Главный российский теннисный медиа-портал' %>">
+  <meta property="og:url" content="https://champion-tennis.ru<%= typeof currentPath !== 'undefined' ? currentPath : '' %>">
+  <meta property="og:site_name" content="Чемпион-Теннис">
+  <meta property="og:image" content="<%= typeof og_image !== 'undefined' && og_image ? og_image : 'https://champion-tennis.ru/images/hero-tennis-ball.jpg' %>">
+  
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://champion-tennis.ru<%= typeof currentPath !== 'undefined' ? currentPath : '' %>">
+  
+  <!-- RSS Feed link -->
+  <link rel="alternate" type="application/rss+xml" title="Чемпион-Теннис RSS" href="/rss.xml">
+  <link rel="alternate" type="application/rss+xml" title="Чемпион-Теннис Срочные Новости RSS" href="/news-rss.xml">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/public/css/main.css">
+
+  <style>
+    /* Critical Inline Fallback Styles */
+    :root {
+      --primary: #0a5c36;
+      --primary-dark: #074025;
+      --accent-clay: #c84c1f;
+      --accent-yellow: #ccff00;
+      --bg-main: #f8fafc;
+      --text-main: #0f172a;
+      --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    body { font-family: var(--font-sans); background: var(--bg-main); color: var(--text-main); margin: 0; line-height: 1.6; }
+    .container { width: 100%; max-width: 1240px; margin: 0 auto; padding: 0 20px; box-sizing: border-box; }
+    .brand-crest { width: 44px; height: 44px; min-width: 44px; max-width: 44px; max-height: 44px; background: #0a5c36; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; overflow: hidden; }
+    .brand-crest svg { width: 26px !important; height: 26px !important; max-width: 26px !important; max-height: 26px !important; }
+    .brand-logo { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; }
+    .brand-name { font-size: 1.35rem; font-weight: 800; color: #074025; text-transform: uppercase; }
+    .brand-name span { color: #c84c1f; }
+  </style>
+</head>
+<body>

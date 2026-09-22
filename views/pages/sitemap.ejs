@@ -1,0 +1,97 @@
+<%- include('../partials/head', { title: 'Карта сайта — Все страницы и разделы Champion-Tennis.ru' }) %>
+<%- include('../partials/header', { activeNav: '' }) %>
+<%- include('../partials/breadcrumbs', { breadcrumbs: breadcrumbs }) %>
+
+<main class="page-main">
+  <div class="container">
+    <div class="article-container" style="max-width: 980px;">
+      
+      <header class="article-header">
+        <h1 class="article-title-main">Карта сайта Champion-Tennis.ru</h1>
+        <p style="font-size: 1rem; color: #64748b;">
+          Полный иерархический каталог разделов, турнирных календарей, аналитических статей, досье игроков и технической документации портала.
+        </p>
+      </header>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 32px; margin-top: 28px;">
+        
+        <!-- Section: News -->
+        <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 20px;">
+          <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--primary); margin-bottom: 12px; border-bottom: 2px solid var(--primary); padding-bottom: 6px;">
+            📰 Новости тенниса
+          </h3>
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 0.875rem;">
+            <li><a href="/news" style="font-weight: 700; color: #0f172a;">• Все новости (Общая лента)</a></li>
+            <li><a href="/news/atp">• ATP Тур (Мужской профессиональный тур)</a></li>
+            <li><a href="/news/wta">• WTA Тур (Женский профессиональный тур)</a></li>
+            <li><a href="/news/grand-slam">• Турниры Большого шлема (Grand Slam)</a></li>
+            <li><a href="/news/team-russia">• Сборная России / РТТ / Кубок Дэвиса</a></li>
+            <li><a href="/news/padel-pickleball">• Падел и Пиклбол в России</a></li>
+            <li><a href="/rss.xml" target="_blank" style="color: var(--accent-clay);">• RSS 2.0 лента (XML)</a></li>
+            <li><a href="/news-rss.xml" target="_blank" style="color: var(--accent-clay);">• Срочная лента новостей RSS (XML)</a></li>
+          </ul>
+        </div>
+
+        <!-- Section: Tournaments & Rankings -->
+        <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 20px;">
+          <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--primary); margin-bottom: 12px; border-bottom: 2px solid var(--primary); padding-bottom: 6px;">
+            🏆 Турниры и Рейтинги
+          </h3>
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 0.875rem;">
+            <li><a href="/tournaments" style="font-weight: 700; color: #0f172a;">• Календарь сезона 2026</a></li>
+            <li><a href="/tournaments">• Результаты матчей и статистика</a></li>
+            <li><a href="/rankings?type=atp">• Рейтинг ATP (Мужчины Top-100)</a></li>
+            <li><a href="/rankings?type=wta">• Рейтинг WTA (Женщины Top-100)</a></li>
+            <li><a href="/players">• Профили игроков и H2H сравнение</a></li>
+          </ul>
+        </div>
+
+        <!-- Section: Blog & Analytics -->
+        <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 20px;">
+          <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--accent-clay); margin-bottom: 12px; border-bottom: 2px solid var(--accent-clay); padding-bottom: 6px;">
+            ✍️ Аналитика и Блог
+          </h3>
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 0.875rem;">
+            <li><a href="/blog" style="font-weight: 700; color: #0f172a;">• Все статьи блога</a></li>
+            <li><a href="/blog/previews">• Превью и прогнозы на матчи</a></li>
+            <li><a href="/blog/tactics">• Разбор тактики и техники топ-игроков</a></li>
+            <li><a href="/blog/interviews">• Эксклюзивные интервью</a></li>
+            <li><a href="/blog/reviews">• Обзоры прошедших турниров</a></li>
+          </ul>
+        </div>
+
+        <!-- Section: Gear & Glossary -->
+        <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 20px;">
+          <h3 style="font-size: 1.15rem; font-weight: 800; color: #059669; margin-bottom: 12px; border-bottom: 2px solid #059669; padding-bottom: 6px;">
+            🎾 Экипировка и Обучение
+          </h3>
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 0.875rem;">
+            <li><a href="/gear" style="font-weight: 700; color: #0f172a;">• Обзоры ракеток, струн и кроссовок</a></li>
+            <li><a href="/gear">• Техника и тактика для любителей</a></li>
+            <li><a href="/gear">• Профилактика «теннисного локтя»</a></li>
+            <li><a href="/glossary">• Глоссарий теннисных терминов (А-Я)</a></li>
+          </ul>
+        </div>
+
+        <!-- Section: Legal & Editorial -->
+        <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 20px;">
+          <h3 style="font-size: 1.15rem; font-weight: 800; color: #334155; margin-bottom: 12px; border-bottom: 2px solid #334155; padding-bottom: 6px;">
+            📄 Служебные и Юридические
+          </h3>
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 0.875rem;">
+            <li><a href="/about">• О проекте и Редакция (E-E-A-T)</a></li>
+            <li><a href="/contacts">• Контакты и Реклама</a></li>
+            <li><a href="/user-agreement">• Пользовательское соглашение</a></li>
+            <li><a href="/privacy-policy">• Политика конфиденциальности (152-ФЗ)</a></li>
+            <li><a href="/site-rules">• Правила пользования сайтом</a></li>
+            <li><a href="/sitemap.xml" target="_blank">• Поисковая XML карта сайта (Sitemap)</a></li>
+          </ul>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

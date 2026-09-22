@@ -1,0 +1,178 @@
+<%- include('../partials/head', { title: 'Турниры и Календарь сезона 2026 — Champion-Tennis.ru' }) %>
+<%- include('../partials/header', { activeNav: 'tournaments' }) %>
+<%- include('../partials/breadcrumbs', { breadcrumbs: breadcrumbs }) %>
+
+<main class="page-main">
+  <div class="container">
+    
+    <div class="section-title-bar" style="margin-bottom: 24px;">
+      <div>
+        <h1 class="section-heading" style="font-size: 1.75rem;">
+          <span class="heading-bar"></span>
+          <span>Календарь теннисных турниров и Результаты</span>
+        </h1>
+        <p style="font-size: 0.875rem; color: #64748b; margin-top: 4px;">
+          Полное расписание сезона 2026: турниры Большого шлема, серии ATP Masters 1000, WTA 1000 и соревнования Российского теннисного тура (РТТ).
+        </p>
+      </div>
+    </div>
+
+    <!-- Interactive Filters for Tournaments -->
+    <div style="background: white; border-radius: 10px; border: 1px solid var(--border); padding: 20px; margin-bottom: 28px;">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+        <!-- Filter Surface -->
+        <div>
+          <label style="display: block; font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 6px;">
+            Покрытие корта:
+          </label>
+          <select id="filterSurface" class="form-control" onchange="applyTournFilter()">
+            <option value="all">Все покрытия</option>
+            <option value="Хард">Хард (Hard)</option>
+            <option value="Грунт">Грунт (Clay / Земля)</option>
+            <option value="Трава">Трава (Grass)</option>
+            <option value="Индор">Индор (Зал / Hard)</option>
+          </select>
+        </div>
+
+        <!-- Filter Country -->
+        <div>
+          <label style="display: block; font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 6px;">
+            Страна проведения:
+          </label>
+          <select id="filterCountry" class="form-control" onchange="applyTournFilter()">
+            <option value="all">Все страны</option>
+            <option value="Россия">🇷🇺 Россия</option>
+            <option value="Австралия">🇦🇺 Австралия</option>
+            <option value="Франция">🇫🇷 Франция</option>
+            <option value="Великобритания">🇬🇧 Великобритания</option>
+            <option value="США">🇺🇸 США</option>
+            <option value="Италия">🇮🇹 Италия</option>
+            <option value="Китай">🇨🇳 Китай</option>
+          </select>
+        </div>
+
+        <!-- Filter Tier -->
+        <div>
+          <label style="display: block; font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 6px;">
+            Категория соревнований:
+          </label>
+          <select id="filterTier" class="form-control" onchange="applyTournFilter()">
+            <option value="all">Все категории</option>
+            <option value="Большой шлем">🏆 Турниры Большого шлема</option>
+            <option value="1000">⚡ ATP Masters 1000 / WTA 1000</option>
+            <option value="РТТ">🇷🇺 Российский теннисный тур (РТТ)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tournaments Table -->
+    <div class="data-table-wrap">
+      <table class="data-table" id="tournamentsTable">
+        <thead>
+          <tr>
+            <th>Даты</th>
+            <th>Название турнира</th>
+            <th>Категория</th>
+            <th>Покрытие</th>
+            <th>Локация</th>
+            <th>Призовой фонд</th>
+            <th>Действующий чемпион</th>
+            <th>Статус</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% tournaments.forEach(function(t) { %>
+            <tr class="tourn-row" data-surface="<%= t.surface %>" data-country="<%= t.country %>" data-tier="<%= t.tier %>">
+              <td style="font-weight: 600; white-space: nowrap;"><%= t.dates %></td>
+              <td>
+                <strong style="color: var(--primary-dark); font-size: 0.9375rem;"><%= t.name %></strong>
+              </td>
+              <td>
+                <span style="font-size: 0.75rem; background: #e2e8f0; padding: 2px 8px; border-radius: 4px; font-weight: 700;">
+                  <%= t.tier %>
+                </span>
+              </td>
+              <td>
+                <span style="display: inline-flex; align-items: center; gap: 4px;">
+                  <span style="width: 8px; height: 8px; border-radius: 50%; background: <%= t.surface.includes('Грунт') ? '#c84c1f' : (t.surface.includes('Трава') ? '#16a34a' : '#0284c7') %>;"></span>
+                  <%= t.surface %>
+                </span>
+              </td>
+              <td><%= t.location %>, <%= t.country %></td>
+              <td style="font-weight: 700; color: #334155;"><%= t.prize_money %></td>
+              <td style="color: #64748b; font-size: 0.8125rem;"><%= t.defending_champion %></td>
+              <td>
+                <span class="status-badge <%= t.status === 'Live' ? 'live' : (t.status === 'Завершен' ? 'finished' : 'soon') %>">
+                  <%= t.status === 'Live' ? '● Идет сейчас' : t.status %>
+                </span>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Match Results Archive Section (tennisbb.ru style) -->
+    <section style="margin-top: 40px;">
+      <div class="section-title-bar">
+        <h2 class="section-heading">
+          <span class="heading-bar"></span>
+          <span>Результаты последних матчей и статистика</span>
+        </h2>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
+        <% liveMatches.forEach(function(m) { %>
+          <div style="background: white; border-radius: 10px; border: 1px solid var(--border); padding: 18px; box-shadow: var(--shadow-sm);">
+            <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #64748b; margin-bottom: 8px;">
+              <span><%= m.tournament_name %></span>
+              <span class="status-badge <%= m.is_live ? 'live' : 'finished' %>"><%= m.status %></span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-top: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; margin-bottom: 8px;">
+              <div>
+                <div style="font-weight: 700; color: <%= m.player1_country === 'RUS' ? '#dc2626' : '#0f172a' %>;"><%= m.player1_name %> (<%= m.player1_country %>)</div>
+                <div style="font-weight: 700; color: <%= m.player2_country === 'RUS' ? '#dc2626' : '#0f172a' %>;"><%= m.player2_name %> (<%= m.player2_country %>)</div>
+              </div>
+              <div style="font-size: 1.15rem; font-weight: 800; color: var(--primary-dark); text-align: right;">
+                <%= m.score %>
+              </div>
+            </div>
+            <div style="font-size: 0.75rem; color: #64748b; display: flex; justify-content: space-between;">
+              <span>Покрытие: <%= m.surface %></span>
+              <span><%= m.court %></span>
+            </div>
+          </div>
+        <% }); %>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<script>
+function applyTournFilter() {
+  const surface = document.getElementById('filterSurface').value;
+  const country = document.getElementById('filterCountry').value;
+  const tier = document.getElementById('filterTier').value;
+
+  const rows = document.querySelectorAll('.tourn-row');
+  rows.forEach(r => {
+    const rSurface = r.dataset.surface;
+    const rCountry = r.dataset.country;
+    const rTier = r.dataset.tier;
+
+    let matchSurface = (surface === 'all' || rSurface.includes(surface));
+    let matchCountry = (country === 'all' || rCountry.includes(country));
+    let matchTier = (tier === 'all' || rTier.includes(tier));
+
+    if (matchSurface && matchCountry && matchTier) {
+      r.style.display = '';
+    } else {
+      r.style.display = 'none';
+    }
+  });
+}
+</script>
+
+<%- include('../partials/footer') %>

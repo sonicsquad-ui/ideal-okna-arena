@@ -1,0 +1,116 @@
+<%- include('../partials/head', { 
+  title: player.name + ' — Биография, рейтинг, трофеи и цитаты | Чемпион-Теннис',
+  meta_description: 'Полное досье теннисиста ' + player.name + ': текущий рейтинг, призовые, очные встречи (H2H), антропометрия и аналитика стиля игры.'
+}) %>
+
+<%- include('../partials/header', { activeNav: 'players' }) %>
+<%- include('../partials/breadcrumbs', { breadcrumbs: breadcrumbs }) %>
+
+<main class="page-main">
+  <div class="container">
+    
+    <!-- Player Hero Card -->
+    <div class="player-hero-card">
+      <div>
+        <img src="<%= player.image %>" alt="<%= player.name %>" class="player-avatar-large">
+      </div>
+
+      <div class="player-info-meta">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+          <span style="font-size: 1.5rem;"><%= player.flag %></span>
+          <span style="font-size: 0.9375rem; font-weight: 700; color: #64748b;"><%= player.country %></span>
+          <span style="background: var(--primary); color: white; font-size: 0.75rem; font-weight: 800; padding: 2px 8px; border-radius: 4px; margin-left: auto;">
+            Рейтинг #<%= player.rank %>
+          </span>
+        </div>
+
+        <h1 class="player-name-main"><%= player.name %></h1>
+        <div class="player-name-en"><%= player.name_en %></div>
+
+        <!-- Metric Grid -->
+        <div class="player-stat-grid">
+          <div class="player-stat-item">
+            <span class="stat-label">Очки ATP/WTA</span>
+            <span class="stat-val"><%= player.points %></span>
+          </div>
+          <div class="player-stat-item">
+            <span class="stat-label">Рекорд карьеры</span>
+            <span class="stat-val">№<%= player.career_high %></span>
+          </div>
+          <div class="player-stat-item">
+            <span class="stat-label">Титулы в туре</span>
+            <span class="stat-val"><%= player.titles %></span>
+          </div>
+          <div class="player-stat-item">
+            <span class="stat-label">Шлемы</span>
+            <span class="stat-val"><%= player.grand_slams %></span>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; font-size: 0.875rem; margin-bottom: 20px;">
+          <div>Дата рождения: <strong><%= player.birth_date %> (<%= player.age %> лет)</strong></div>
+          <div>Рост / Вес: <strong><%= player.height %> см / <%= player.weight %> кг</strong></div>
+          <div>Рабочая рука: <strong><%= player.plays %></strong></div>
+        </div>
+
+        <!-- Quotes Section -->
+        <% if (player.quotes) { %>
+          <blockquote style="background: #f8fafc; border-left: 4px solid var(--accent-clay); padding: 14px 18px; font-style: italic; color: #334155; border-radius: 0 6px 6px 0; margin-bottom: 20px;">
+            <%= player.quotes %>
+          </blockquote>
+        <% } %>
+
+        <div style="color: #334155; line-height: 1.65; font-size: 0.9375rem;">
+          <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 8px;">Биография и стиль игры</h3>
+          <p><%= player.bio %></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- H2H Section -->
+    <% if (h2hList && h2hList.length > 0) { %>
+      <section class="h2h-box">
+        <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 16px;">
+          ⚔️ История очных встреч (Head-to-Head) против ключевых соперников:
+        </h3>
+        <div>
+          <% h2hList.forEach(function(item) { %>
+            <div class="h2h-row">
+              <span class="h2h-rival">Против <%= item.rival %></span>
+              <span class="h2h-badge"><%= item.score %></span>
+            </div>
+          <% }); %>
+        </div>
+      </section>
+    <% } %>
+
+    <!-- Related News for this player -->
+    <% if (relatedNews && relatedNews.length > 0) { %>
+      <section style="margin-top: 36px;">
+        <div class="section-title-bar">
+          <h3 class="section-heading">
+            <span class="heading-bar"></span>
+            <span>Последние новости о спортсмене</span>
+          </h3>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+          <% relatedNews.forEach(function(n) { %>
+            <div style="background: white; border-radius: 8px; border: 1px solid var(--border); padding: 16px;">
+              <div style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 6px;"><%= n.published_at_formatted %></div>
+              <a href="/news/<%= n.category %>/<%= n.slug %>" style="font-weight: 700; font-size: 1rem; color: var(--text-main); line-height: 1.4; display: block; margin-bottom: 8px;">
+                <%= n.title %>
+              </a>
+              <p style="font-size: 0.8125rem; color: #64748b; margin-bottom: 10px;"><%= n.excerpt %></p>
+              <a href="/news/<%= n.category %>/<%= n.slug %>" style="color: var(--primary); font-weight: 700; font-size: 0.8125rem;">
+                Читать подробнее &rarr;
+              </a>
+            </div>
+          <% }); %>
+        </div>
+      </section>
+    <% } %>
+
+  </div>
+</main>
+
+<%- include('../partials/footer') %>
