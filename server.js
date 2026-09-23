@@ -88,19 +88,17 @@ function requireAdmin(req, res, next) {
   res.redirect('/admin/login');
 }
 
-// Helper: Format date in Russian (Moscow timezone)
+// Helper: Format date in Russian (Moscow timezone) - ДД.ММ.ГГГГ ЧЧ:ММ (Пункт 3)
 function formatDateRu(dateStr) {
   if (!dateStr) return '';
   const d = new Date(dateStr);
   if (isNaN(d.getTime())) return dateStr;
-  return d.toLocaleDateString('ru-RU', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric'
-  }) + ' ' + d.toLocaleTimeString('ru-RU', {
-    hour: '2-digit',
-    minute: '2-digit'
-  });
+  const day = String(d.getDate()).padStart(2, '0');
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const year = d.getFullYear();
+  const hours = String(d.getHours()).padStart(2, '0');
+  const minutes = String(d.getMinutes()).padStart(2, '0');
+  return `${day}.${month}.${year} ${hours}:${minutes}`;
 }
 
 // ==========================================================================
@@ -143,8 +141,8 @@ app.get('/', (req, res) => {
   const russianStars = db.prepare("SELECT * FROM players WHERE country_code = 'RUS' ORDER BY rank ASC LIMIT 4").all();
 
   res.render('pages/index', {
-    title: 'Чемпион-Теннис | Главный портал тенниса России — Новости, Рейтинги, Турниры',
-    meta_description: 'Все новости тенниса сегодня: результаты матчей ATP и WTA, турниры Большого шлема, аналитика, календарь, рейтинги игроков и мир падела на champion-tennis.ru.',
+    title: 'Теннис: новости российского и мирового тенниса, результаты, календарь турниров 2026, новости спорта, рейтинги, статьи - Чемпион-Теннис',
+    meta_description: 'Спортивный портал тенниса России Чемпион-Теннис: новости тенниса и спорта, расписание турниров, рейтинги, аналитика, статьи.',
     liveMatches,
     top24News,
     editorsArticles,
@@ -233,13 +231,22 @@ app.get('/news/:category/:slug', (req, res) => {
 
   const categoryLabel = NEWS_CATEGORIES[newsItem.category] || 'Новости';
 
-  // Related news
-  const rawRelated = db.prepare(`
+  // Related news (Еще новости - 3 карточки)
+  let rawRelated = db.prepare(`
     SELECT * FROM news 
     WHERE category = ? AND id != ?
     ORDER BY published_at DESC 
     LIMIT 3
   `).all(newsItem.category, newsItem.id);
+
+  if (rawRelated.length < 3) {
+    rawRelated = db.prepare(`
+      SELECT * FROM news 
+      WHERE id != ?
+      ORDER BY published_at DESC 
+      LIMIT 3
+    `).all(newsItem.id);
+  }
   const relatedNews = rawRelated.map(n => ({
     ...n,
     published_at_formatted: formatDateRu(n.published_at)
@@ -402,6 +409,17 @@ app.get(['/blog', '/blog/:category'], (req, res, next) => {
   });
 });
 
+// Single Blog Article: /blog/:category/:slug or direct /blog/:slug
+app.get('/blog/:slug', (req, res, next) => {
+  const { slug } = req.params;
+  if (BLOG_CATEGORIES[slug]) return next();
+  const article = db.prepare('SELECT * FROM articles WHERE slug = ?').get(slug);
+  if (article) {
+    return res.redirect(301, `/blog/${article.category}/${article.slug}`);
+  }
+  next();
+});
+
 // Single Blog Article: /blog/:category/:slug
 app.get('/blog/:category/:slug', (req, res) => {
   const { category, slug } = req.params;
@@ -418,12 +436,22 @@ app.get('/blog/:category/:slug', (req, res) => {
 
   const categoryLabel = BLOG_CATEGORIES[article.category] || 'Аналитика';
 
-  const rawRelated = db.prepare(`
+  // Related articles (Советуем почитать - 3 карточки)
+  let rawRelated = db.prepare(`
     SELECT * FROM articles 
     WHERE category = ? AND id != ?
     ORDER BY published_at DESC 
     LIMIT 3
   `).all(article.category, article.id);
+
+  if (rawRelated.length < 3) {
+    rawRelated = db.prepare(`
+      SELECT * FROM articles 
+      WHERE id != ?
+      ORDER BY published_at DESC 
+      LIMIT 3
+    `).all(article.id);
+  }
   const relatedArticles = rawRelated.map(a => ({
     ...a,
     published_at_formatted: formatDateRu(a.published_at)
@@ -518,10 +546,17 @@ app.get('/site-rules', (req, res) => {
   res.render('pages/site_rules', { page, breadcrumbs });
 });
 
+app.get('/robots.txt', (req, res) => {
+  res.type('text/plain');
+  res.send("User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /api/\n\nSitemap: https://champion-tennis.ru/sitemap.xml\nHost: champion-tennis.ru\n");
+});
+
 app.get('/sitemap', (req, res) => {
   const page = db.prepare("SELECT * FROM pages WHERE slug = 'sitemap'").get();
+  const allNews = db.prepare("SELECT title, category, slug FROM news ORDER BY published_at DESC").all();
+  const allArticles = db.prepare("SELECT title, category, slug FROM articles ORDER BY published_at DESC").all();
   const breadcrumbs = [{ title: 'Карта сайта', url: '/sitemap' }];
-  res.render('pages/sitemap', { page, breadcrumbs });
+  res.render('pages/sitemap', { page, allNews, allArticles, breadcrumbs });
 });
 
 // ==========================================================================
@@ -617,9 +652,9 @@ app.get('/api/search', (req, res) => {
   const newsMatches = db.prepare(`
     SELECT title, category, slug, published_at 
     FROM news 
-    WHERE title LIKE ? OR excerpt LIKE ? 
-    ORDER BY published_at DESC LIMIT 4
-  `).all(queryLike, queryLike);
+    WHERE ru_like(title, ?) = 1 OR ru_like(excerpt, ?) = 1 
+    ORDER BY published_at DESC LIMIT 5
+  `).all(q, q);
 
   for (const n of newsMatches) {
     results.push({
@@ -634,9 +669,9 @@ app.get('/api/search', (req, res) => {
   const blogMatches = db.prepare(`
     SELECT title, category, slug, published_at 
     FROM articles 
-    WHERE title LIKE ? OR excerpt LIKE ? 
-    ORDER BY published_at DESC LIMIT 3
-  `).all(queryLike, queryLike);
+    WHERE ru_like(title, ?) = 1 OR ru_like(excerpt, ?) = 1 
+    ORDER BY published_at DESC LIMIT 4
+  `).all(q, q);
 
   for (const a of blogMatches) {
     results.push({
@@ -651,9 +686,9 @@ app.get('/api/search', (req, res) => {
   const playerMatches = db.prepare(`
     SELECT name, name_en, slug 
     FROM players 
-    WHERE name LIKE ? OR name_en LIKE ? 
+    WHERE ru_like(name, ?) = 1 OR ru_like(name_en, ?) = 1 
     LIMIT 3
-  `).all(queryLike, queryLike);
+  `).all(q, q);
 
   for (const p of playerMatches) {
     results.push({
@@ -831,6 +866,7 @@ function getAdminStats() {
     pagesCount: db.prepare('SELECT COUNT(*) as c FROM pages').get().c,
     articlesCount: db.prepare('SELECT COUNT(*) as c FROM articles').get().c,
     newsCount: db.prepare('SELECT COUNT(*) as c FROM news').get().c,
+    gearCount: db.prepare('SELECT COUNT(*) as c FROM gear_reviews').get().c,
     submissionsCount: db.prepare('SELECT COUNT(*) as c FROM form_submissions').get().c
   };
 }
@@ -1084,6 +1120,51 @@ app.post('/admin/api/trigger-news-update', requireAdmin, (req, res) => {
   }
 });
 
+// --- Admin Gear Management (Ракетки и Экипировка 2026) ---
+
+app.get('/admin/gear', requireAdmin, (req, res) => {
+  const stats = getAdminStats();
+  const gear = db.prepare('SELECT * FROM gear_reviews ORDER BY id ASC').all();
+  res.render('admin/gear_list', { stats, gear });
+});
+
+app.get('/admin/gear/new', requireAdmin, (req, res) => {
+  const stats = getAdminStats();
+  res.render('admin/gear_edit', { stats, isEdit: false, gearItem: null });
+});
+
+app.post('/admin/gear/save', requireAdmin, (req, res) => {
+  const { id, title, slug, category, brand, price, rating, image, content } = req.body;
+  const itemSlug = slugifyText(slug || title);
+
+  if (id && parseInt(id) > 0) {
+    db.prepare(`
+      UPDATE gear_reviews SET 
+        title = ?, slug = ?, category = ?, brand = ?, price = ?, rating = ?, image = ?, content = ?
+      WHERE id = ?
+    `).run(title, itemSlug, category, brand, price, parseFloat(rating) || 9.5, image || '/images/gear-rackets.jpg', content, id);
+  } else {
+    db.prepare(`
+      INSERT INTO gear_reviews (title, slug, category, brand, price, rating, image, content)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(title, itemSlug, category, brand, price, parseFloat(rating) || 9.5, image || '/images/gear-rackets.jpg', content);
+  }
+
+  res.redirect('/admin/gear');
+});
+
+app.get('/admin/gear/edit/:id', requireAdmin, (req, res) => {
+  const stats = getAdminStats();
+  const gearItem = db.prepare('SELECT * FROM gear_reviews WHERE id = ?').get(req.params.id);
+  if (!gearItem) return res.redirect('/admin/gear');
+  res.render('admin/gear_edit', { stats, isEdit: true, gearItem });
+});
+
+app.get('/admin/gear/delete/:id', requireAdmin, (req, res) => {
+  db.prepare('DELETE FROM gear_reviews WHERE id = ?').run(req.params.id);
+  res.redirect('/admin/gear');
+});
+
 // --- Admin Global Blocks Management ---
 
 app.get('/admin/global-blocks', requireAdmin, (req, res) => {
@@ -1138,6 +1219,16 @@ app.get('/admin/submissions', requireAdmin, (req, res) => {
   const stats = getAdminStats();
   const submissions = db.prepare('SELECT * FROM form_submissions ORDER BY created_at DESC').all();
   res.render('admin/submissions', { stats, submissions });
+});
+
+app.get('/admin/submissions/process/:id', requireAdmin, (req, res) => {
+  db.prepare("UPDATE form_submissions SET status = 'processed' WHERE id = ?").run(req.params.id);
+  res.redirect('/admin/submissions');
+});
+
+app.get('/admin/submissions/delete/:id', requireAdmin, (req, res) => {
+  db.prepare("DELETE FROM form_submissions WHERE id = ?").run(req.params.id);
+  res.redirect('/admin/submissions');
 });
 
 // ==========================================================================

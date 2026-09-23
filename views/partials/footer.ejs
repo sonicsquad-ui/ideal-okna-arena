@@ -1,11 +1,11 @@
 <footer class="site-footer">
   <div class="container">
     <div class="footer-top-grid">
-      <!-- Col 1: Brand & About -->
+      <!-- Col 1: Brand & Slogan (Пункт 7: «лучшее из мира спорта и тенниса») -->
       <div class="footer-col-brand">
         <div class="footer-brand-title">Чемпион-<span>Теннис</span></div>
         <p class="footer-about-text">
-          Главный всероссийский медиа-портал о большом теннисе, турнирах ATP и WTA, турнирах Большого шлема, сборной России, а также быстрорастущем мире падела и пиклбола.
+          <%= typeof globalSettings !== 'undefined' && globalSettings.footer && globalSettings.footer.about_text ? globalSettings.footer.about_text : 'лучшее из мира спорта и тенниса' %>
         </p>
         <div class="footer-social-row">
           <a href="https://t.me/champion_tennis_ru" target="_blank" rel="noopener" class="footer-social-link" title="Telegram">
@@ -25,7 +25,7 @@
         <div class="footer-col-title">Разделы портала</div>
         <ul class="footer-links-list">
           <li><a href="/news">Новости тенниса</a></li>
-          <li><a href="/tournaments">Турниры и календарь</a></li>
+          <li><a href="/tournaments">Турниры и календарь 2026</a></li>
           <li><a href="/rankings">Рейтинги ATP и WTA</a></li>
           <li><a href="/players">Профили игроков и H2H</a></li>
           <li><a href="/blog">Аналитика и Мнения</a></li>
@@ -44,7 +44,6 @@
           <li><a href="/news/team-russia">Сборная России / РТТ</a></li>
           <li><a href="/news/padel-pickleball">Падел и Пиклбол</a></li>
           <li><a href="/tournaments">Мастерс 1000 и Кубок Кремля</a></li>
-          <li><a href="/news-rss.xml">Срочная лента RSS</a></li>
         </ul>
       </div>
 
@@ -63,10 +62,10 @@
       </div>
     </div>
 
-    <!-- Bottom line -->
+    <!-- Bottom line (Пункт 7: авто-год и обязательное указание ссылки при перепечатке) -->
     <div class="footer-bottom-bar">
       <div>
-        © 2026 <strong>champion-tennis.ru</strong> (Чемпион-Теннис). Все права защищены. Возрастная категория: <strong>16+</strong>.
+        © <%= new Date().getFullYear() %> <strong>champion-tennis.ru</strong> (Чемпион-Теннис). Все права защищены. Возрастная категория: <strong>16+</strong>. При перепечатке материалов с сайта champion-tennis.ru ссылка на сайт обязательна!
       </div>
       <div class="footer-legal-links">
         <a href="/user-agreement">Пользовательское соглашение</a>

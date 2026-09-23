@@ -4,7 +4,7 @@
 
 <main class="page-main">
   <div class="container">
-    <article class="article-container">
+    <article class="article-container" style="max-width: 960px;">
       <header class="article-header">
         <h1 class="article-title-main"><%= page.title %></h1>
         <div class="article-meta-bar">
@@ -13,8 +13,33 @@
         </div>
       </header>
 
-      <div class="article-content">
+      <div class="article-content" style="font-size: 1.05rem; line-height: 1.75; color: #1e293b;">
         <%- page.content %>
+      </div>
+
+      <!-- Форма обратной связи (Пункт 9) -->
+      <div class="feedback-embed-card" style="margin-top: 40px; padding: 28px; background: #f8fafc; border: 1px solid var(--border); border-radius: 10px;">
+        <h3 style="font-size: 1.25rem; font-weight: 800; color: #074025; margin: 0 0 8px 0;">
+          Форма обратной связи с редакцией
+        </h3>
+        <p style="font-size: 0.875rem; color: #64748b; margin: 0 0 20px 0;">
+          Если у вас возникли вопросы по правилам пользования сайтом или предложения по работе портала, заполните форму ниже:
+        </p>
+        <form id="contactForm" style="display: flex; flex-direction: column; gap: 14px;">
+          <input type="hidden" name="form_type" value="Вопрос по правилам сайта">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px;">
+            <input type="text" name="name" class="cta-input" placeholder="Ваше имя" required style="border: 1px solid #cbd5e1; background: white; color: #0f172a;">
+            <input type="text" name="contact" class="cta-input" placeholder="Ваш Email или телефон" required style="border: 1px solid #cbd5e1; background: white; color: #0f172a;">
+          </div>
+          <input type="text" name="subject" class="cta-input" value="Вопрос по правилам пользования сайтом" required style="border: 1px solid #cbd5e1; background: white; color: #0f172a;">
+          <textarea name="message" class="cta-input" rows="4" placeholder="Текст вашего сообщения или вопроса..." required style="border: 1px solid #cbd5e1; background: white; color: #0f172a;"></textarea>
+          <button type="submit" class="btn-cta-submit" style="border: none; padding: 12px; font-weight: 700;">
+            Отправить обращение дежурному редактору &rarr;
+          </button>
+          <div style="font-size: 0.75rem; color: #94a3b8; text-align: center;">
+            Нажимая кнопку, вы соглашаетесь с <a href="/privacy-policy" style="text-decoration: underline;">Политикой обработки персональных данных</a>.
+          </div>
+        </form>
       </div>
     </article>
   </div>

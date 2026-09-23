@@ -69,32 +69,62 @@
         </div>
       </div>
 
-      <!-- Author Box (E-E-A-T trust block) -->
-      <div style="margin-top: 36px; padding: 20px; background: #f8fafc; border-radius: 8px; border: 1px solid var(--border); display: flex; align-items: center; gap: 16px;">
-        <img src="<%= article.author_avatar || '/images/author-coach.jpg' %>" alt="<%= article.author_name %>" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover;">
-        <div>
-          <div style="font-weight: 800; font-size: 1.05rem; color: var(--text-main);"><%= article.author_name %></div>
-          <div style="font-size: 0.8125rem; color: var(--primary); font-weight: 600; margin-bottom: 4px;"><%= article.author_role %></div>
-          <p style="font-size: 0.8125rem; color: #64748b; line-height: 1.45;">
-            Постоянный колумнист портала «Чемпион-Теннис». Проводит экспертную экспертизу спортивных матчей, тестирует ракетки и анализирует физиологию теннисных нагрузок.
-          </p>
+      <!-- Author Box (Пункт 11: 1-2 автора с фото, именем-фамилией и данными со страницы О проекте) -->
+      <div class="article-authors-card" style="margin-top: 40px; padding: 24px; background: #f8fafc; border-radius: 10px; border: 1px solid var(--border);">
+        <h3 style="font-size: 1.15rem; font-weight: 800; color: #074025; margin: 0 0 18px 0; display: flex; align-items: center; gap: 8px;">
+          <span style="display:inline-block; width:6px; height:20px; background:#0a5c36; border-radius:3px;"></span>
+          Авторы и эксперты публикации
+        </h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+          <div style="display: flex; gap: 14px; align-items: flex-start;">
+            <img src="/images/author-coach.jpg" alt="Михаил Соколов" style="width: 64px; height: 64px; border-radius: 50%; object-fit: cover; flex-shrink: 0; border: 2px solid #0a5c36;">
+            <div>
+              <div style="font-weight: 800; font-size: 1rem; color: #0f172a;">Михаил Соколов</div>
+              <div style="font-size: 0.8rem; color: #0a5c36; font-weight: 700; margin-bottom: 4px;">Главный редактор, мастер спорта по теннису</div>
+              <p style="font-size: 0.8125rem; color: #64748b; line-height: 1.45; margin: 0;">В теннисе более 20 лет. Экс-игрок турниров РТТ и Futures. Автор более 500 аналитических колонок о биомеханике и тактике мирового тура.</p>
+            </div>
+          </div>
+          <div style="display: flex; gap: 14px; align-items: flex-start;">
+            <img src="/images/author-analyst.jpg" alt="Екатерина Романова" style="width: 64px; height: 64px; border-radius: 50%; object-fit: cover; flex-shrink: 0; border: 2px solid #c84c1f;">
+            <div>
+              <div style="font-weight: 800; font-size: 1rem; color: #0f172a;">Екатерина Романова</div>
+              <div style="font-size: 0.8rem; color: #c84c1f; font-weight: 700; margin-bottom: 4px;">Ведущий аналитик тура WTA и экипировки</div>
+              <p style="font-size: 0.8125rem; color: #64748b; line-height: 1.45; margin: 0;">Спортивный журналист, постоянный обозреватель турниров Большого шлема. Эксперт по подбору ракеток и спортивной биомеханике.</p>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Related Blog Articles -->
+      <!-- Блок «Советуем почитать» (Пункт 12: 3 кликабельные карточки последних статей блога) -->
       <% if (relatedArticles && relatedArticles.length > 0) { %>
-        <div style="margin-top: 40px; padding-top: 28px; border-top: 2px solid var(--border);">
-          <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 18px; color: var(--text-main);">
-            Другие материалы из блога:
+        <div class="recommended-blog-section" style="margin-top: 40px; padding-top: 28px; border-top: 2px solid var(--border);">
+          <h3 style="font-size: 1.35rem; font-weight: 800; margin-bottom: 20px; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
+            <span style="display:inline-block; width:6px; height:24px; background:var(--accent-clay); border-radius:3px;"></span>
+            Советуем почитать
           </h3>
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px;">
             <% relatedArticles.forEach(function(rel) { %>
-              <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 14px;">
-                <div style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 4px;"><%= rel.published_at_formatted %></div>
-                <a href="/blog/<%= rel.category %>/<%= rel.slug %>" style="font-weight: 700; font-size: 0.9375rem; color: var(--text-main); line-height: 1.35; display: block;">
-                  <%= rel.title %>
+              <article class="editors-card" style="margin: 0;">
+                <a href="/blog/<%= rel.category %>/<%= rel.slug %>" style="display: block; overflow: hidden; border-radius: 6px;">
+                  <img src="<%= rel.image || '/images/hero-tennis-ball.jpg' %>" class="editors-img" alt="<%= rel.title %>" style="width: 100%; aspect-ratio: 16/10; object-fit: cover;">
                 </a>
-              </div>
+                <div class="editors-body" style="padding: 14px 0 0 0;">
+                  <div style="font-size: 0.75rem; color: #64748b; margin-bottom: 4px; font-weight: 600;">
+                    📅 <%= rel.published_at_formatted %> • ⏱️ <%= rel.reading_time || 5 %> мин
+                  </div>
+                  <h4 style="margin: 0 0 8px; font-size: 1rem; font-weight: 800; line-height: 1.4;">
+                    <a href="/blog/<%= rel.category %>/<%= rel.slug %>" style="color: var(--text-main); text-decoration: none;">
+                      <%= rel.title %>
+                    </a>
+                  </h4>
+                  <p style="font-size: 0.8125rem; color: #475569; margin: 0 0 10px 0; line-height: 1.45;">
+                    <%= rel.excerpt ? rel.excerpt.substring(0, 100) : '' %>...
+                  </p>
+                  <a href="/blog/<%= rel.category %>/<%= rel.slug %>" class="btn-read-more" style="font-size: 0.8125rem;">
+                    Читать статью &rarr;
+                  </a>
+                </div>
+              </article>
             <% }); %>
           </div>
         </div>

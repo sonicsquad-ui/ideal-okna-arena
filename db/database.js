@@ -13,6 +13,12 @@ const db = new Database(dbPath);
 db.pragma('journal_mode = WAL');
 db.pragma('foreign_keys = ON');
 
+// Register custom case-insensitive Cyrillic search function
+db.function('ru_like', (haystack, needle) => {
+  if (!haystack || !needle) return 0;
+  return haystack.toLowerCase().includes(needle.toLowerCase()) ? 1 : 0;
+});
+
 function initDatabase() {
   db.exec(`
     -- Pages table (Visual Page Editor)

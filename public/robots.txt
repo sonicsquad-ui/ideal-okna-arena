@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api/
+
+Sitemap: https://champion-tennis.ru/sitemap.xml
+Host: champion-tennis.ru

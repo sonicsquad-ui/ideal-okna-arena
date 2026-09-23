@@ -9,82 +9,91 @@
       <header class="article-header">
         <h1 class="article-title-main">Карта сайта Champion-Tennis.ru</h1>
         <p style="font-size: 1rem; color: #64748b;">
-          Полный иерархический каталог разделов, турнирных календарей, аналитических статей, досье игроков и технической документации портала.
+          Полный иерархический каталог всех разделов, новостей и аналитических статей портала «Чемпион-Теннис». Каждая ссылка кликабельна для прямого перехода.
         </p>
       </header>
 
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 32px; margin-top: 28px;">
+      <div style="display: flex; flex-direction: column; gap: 32px; margin-top: 28px;">
         
-        <!-- Section: News -->
-        <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 20px;">
-          <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--primary); margin-bottom: 12px; border-bottom: 2px solid var(--primary); padding-bottom: 6px;">
-            📰 Новости тенниса
-          </h3>
-          <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 0.875rem;">
-            <li><a href="/news" style="font-weight: 700; color: #0f172a;">• Все новости (Общая лента)</a></li>
-            <li><a href="/news/atp">• ATP Тур (Мужской профессиональный тур)</a></li>
-            <li><a href="/news/wta">• WTA Тур (Женский профессиональный тур)</a></li>
-            <li><a href="/news/grand-slam">• Турниры Большого шлема (Grand Slam)</a></li>
-            <li><a href="/news/team-russia">• Сборная России / РТТ / Кубок Дэвиса</a></li>
-            <li><a href="/news/padel-pickleball">• Падел и Пиклбол в России</a></li>
-            <li><a href="/rss.xml" target="_blank" style="color: var(--accent-clay);">• RSS 2.0 лента (XML)</a></li>
-            <li><a href="/news-rss.xml" target="_blank" style="color: var(--accent-clay);">• Срочная лента новостей RSS (XML)</a></li>
+        <!-- Section 1: Главные разделы -->
+        <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 24px;">
+          <h2 style="font-size: 1.2rem; font-weight: 800; color: var(--primary); margin-bottom: 14px; border-bottom: 2px solid var(--primary); padding-bottom: 6px;">
+            🏆 Основные разделы портала
+          </h2>
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 10px; font-size: 0.9rem; padding: 0; margin: 0;">
+            <li><a href="/" style="font-weight: 700; color: #0f172a;">Главная страница: Теннис: новости и аналитика</a> — <code>https://champion-tennis.ru/</code></li>
+            <li><a href="/news" style="font-weight: 700; color: #0f172a;">Лента новостей тенниса</a> — <code>https://champion-tennis.ru/news</code></li>
+            <li><a href="/tournaments" style="font-weight: 700; color: #0f172a;">Календарь теннисных турниров 2026</a> — <code>https://champion-tennis.ru/tournaments</code></li>
+            <li><a href="/rankings" style="font-weight: 700; color: #0f172a;">Официальные рейтинги ATP и WTA</a> — <code>https://champion-tennis.ru/rankings</code></li>
+            <li><a href="/players" style="font-weight: 700; color: #0f172a;">Игроки мирового тура</a> — <code>https://champion-tennis.ru/players</code></li>
+            <li><a href="/blog" style="font-weight: 700; color: #0f172a;">Аналитика и Блог о теннисе</a> — <code>https://champion-tennis.ru/blog</code></li>
+            <li><a href="/gear" style="font-weight: 700; color: #0f172a;">Ракетки и Экипировка 2026</a> — <code>https://champion-tennis.ru/gear</code></li>
+            <li><a href="/glossary" style="font-weight: 700; color: #0f172a;">Глоссарий теннисных терминов</a> — <code>https://champion-tennis.ru/glossary</code></li>
           </ul>
         </div>
 
-        <!-- Section: Tournaments & Rankings -->
-        <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 20px;">
-          <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--primary); margin-bottom: 12px; border-bottom: 2px solid var(--primary); padding-bottom: 6px;">
-            🏆 Турниры и Рейтинги
-          </h3>
-          <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 0.875rem;">
-            <li><a href="/tournaments" style="font-weight: 700; color: #0f172a;">• Календарь сезона 2026</a></li>
-            <li><a href="/tournaments">• Результаты матчей и статистика</a></li>
-            <li><a href="/rankings?type=atp">• Рейтинг ATP (Мужчины Top-100)</a></li>
-            <li><a href="/rankings?type=wta">• Рейтинг WTA (Женщины Top-100)</a></li>
-            <li><a href="/players">• Профили игроков и H2H сравнение</a></li>
+        <!-- Section 2: Рубрики новостей -->
+        <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 24px;">
+          <h2 style="font-size: 1.2rem; font-weight: 800; color: var(--primary); margin-bottom: 14px; border-bottom: 2px solid var(--primary); padding-bottom: 6px;">
+            📰 Рубрики новостей тенниса
+          </h2>
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 10px; font-size: 0.9rem; padding: 0; margin: 0;">
+            <li><a href="/news/atp" style="font-weight: 700; color: #0f172a;">ATP Тур (Мужчины)</a> — <code>https://champion-tennis.ru/news/atp</code></li>
+            <li><a href="/news/wta" style="font-weight: 700; color: #0f172a;">WTA Тур (Женщины)</a> — <code>https://champion-tennis.ru/news/wta</code></li>
+            <li><a href="/news/grand-slam" style="font-weight: 700; color: #0f172a;">Турниры Большого шлема (Grand Slam)</a> — <code>https://champion-tennis.ru/news/grand-slam</code></li>
+            <li><a href="/news/team-russia" style="font-weight: 700; color: #0f172a;">🇷🇺 Сборная России / РТТ / Кубок Дэвиса</a> — <code>https://champion-tennis.ru/news/team-russia</code></li>
+            <li><a href="/news/padel-pickleball" style="font-weight: 700; color: #0f172a;">🎾 Падел и Пиклбол в России</a> — <code>https://champion-tennis.ru/news/padel-pickleball</code></li>
           </ul>
         </div>
 
-        <!-- Section: Blog & Analytics -->
-        <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 20px;">
-          <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--accent-clay); margin-bottom: 12px; border-bottom: 2px solid var(--accent-clay); padding-bottom: 6px;">
-            ✍️ Аналитика и Блог
-          </h3>
-          <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 0.875rem;">
-            <li><a href="/blog" style="font-weight: 700; color: #0f172a;">• Все статьи блога</a></li>
-            <li><a href="/blog/previews">• Превью и прогнозы на матчи</a></li>
-            <li><a href="/blog/tactics">• Разбор тактики и техники топ-игроков</a></li>
-            <li><a href="/blog/interviews">• Эксклюзивные интервью</a></li>
-            <li><a href="/blog/reviews">• Обзоры прошедших турниров</a></li>
+        <!-- Section 3: Статьи блога -->
+        <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 24px;">
+          <h2 style="font-size: 1.2rem; font-weight: 800; color: var(--accent-clay); margin-bottom: 14px; border-bottom: 2px solid var(--accent-clay); padding-bottom: 6px;">
+            ✍️ Статьи блога и Аналитические разборы
+          </h2>
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 10px; font-size: 0.875rem; padding: 0; margin: 0;">
+            <% if (typeof allArticles !== 'undefined' && allArticles) { %>
+              <% allArticles.forEach(function(art) { %>
+                <li>
+                  <a href="/blog/<%= art.category %>/<%= art.slug %>" style="font-weight: 700; color: #0f172a;">• <%= art.title %></a><br>
+                  <code style="font-size: 0.8rem; color: #64748b;">https://champion-tennis.ru/blog/<%= art.category %>/<%= art.slug %></code>
+                </li>
+              <% }); %>
+            <% } %>
           </ul>
         </div>
 
-        <!-- Section: Gear & Glossary -->
-        <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 20px;">
-          <h3 style="font-size: 1.15rem; font-weight: 800; color: #059669; margin-bottom: 12px; border-bottom: 2px solid #059669; padding-bottom: 6px;">
-            🎾 Экипировка и Обучение
-          </h3>
-          <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 0.875rem;">
-            <li><a href="/gear" style="font-weight: 700; color: #0f172a;">• Обзоры ракеток, струн и кроссовок</a></li>
-            <li><a href="/gear">• Техника и тактика для любителей</a></li>
-            <li><a href="/gear">• Профилактика «теннисного локтя»</a></li>
-            <li><a href="/glossary">• Глоссарий теннисных терминов (А-Я)</a></li>
+        <!-- Section 4: Все новости -->
+        <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 24px;">
+          <h2 style="font-size: 1.2rem; font-weight: 800; color: var(--primary); margin-bottom: 14px; border-bottom: 2px solid var(--primary); padding-bottom: 6px;">
+            ⚡ Все новости портала
+          </h2>
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 10px; font-size: 0.875rem; padding: 0; margin: 0;">
+            <% if (typeof allNews !== 'undefined' && allNews) { %>
+              <% allNews.forEach(function(n) { %>
+                <li>
+                  <a href="/news/<%= n.category %>/<%= n.slug %>" style="font-weight: 600; color: #0f172a;">• <%= n.title %></a><br>
+                  <code style="font-size: 0.8rem; color: #64748b;">https://champion-tennis.ru/news/<%= n.category %>/<%= n.slug %></code>
+                </li>
+              <% }); %>
+            <% } %>
           </ul>
         </div>
 
-        <!-- Section: Legal & Editorial -->
-        <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 20px;">
-          <h3 style="font-size: 1.15rem; font-weight: 800; color: #334155; margin-bottom: 12px; border-bottom: 2px solid #334155; padding-bottom: 6px;">
-            📄 Служебные и Юридические
-          </h3>
-          <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 0.875rem;">
-            <li><a href="/about">• О проекте и Редакция (E-E-A-T)</a></li>
-            <li><a href="/contacts">• Контакты и Реклама</a></li>
-            <li><a href="/user-agreement">• Пользовательское соглашение</a></li>
-            <li><a href="/privacy-policy">• Политика конфиденциальности (152-ФЗ)</a></li>
-            <li><a href="/site-rules">• Правила пользования сайтом</a></li>
-            <li><a href="/sitemap.xml" target="_blank">• Поисковая XML карта сайта (Sitemap)</a></li>
+        <!-- Section 5: Документы и Редакция -->
+        <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 24px;">
+          <h2 style="font-size: 1.2rem; font-weight: 800; color: #334155; margin-bottom: 14px; border-bottom: 2px solid #334155; padding-bottom: 6px;">
+            📄 Документы, Редакция и Технические ленты
+          </h2>
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 10px; font-size: 0.9rem; padding: 0; margin: 0;">
+            <li><a href="/about" style="font-weight: 700; color: #0f172a;">О проекте и Редакция (E-E-A-T)</a> — <code>https://champion-tennis.ru/about</code></li>
+            <li><a href="/contacts" style="font-weight: 700; color: #0f172a;">Контакты и Размещение Рекламы</a> — <code>https://champion-tennis.ru/contacts</code></li>
+            <li><a href="/user-agreement" style="font-weight: 700; color: #0f172a;">Пользовательское соглашение</a> — <code>https://champion-tennis.ru/user-agreement</code></li>
+            <li><a href="/privacy-policy" style="font-weight: 700; color: #0f172a;">Политика конфиденциальности (152-ФЗ)</a> — <code>https://champion-tennis.ru/privacy-policy</code></li>
+            <li><a href="/site-rules" style="font-weight: 700; color: #0f172a;">Правила пользования сайтом</a> — <code>https://champion-tennis.ru/site-rules</code></li>
+            <li><a href="/sitemap.xml" target="_blank" style="font-weight: 700; color: #0f172a;">Поисковая XML карта сайта (Sitemap)</a> — <code>https://champion-tennis.ru/sitemap.xml</code></li>
+            <li><a href="/rss.xml" target="_blank" style="font-weight: 700; color: #0f172a;">Новостной RSS 2.0 канал</a> — <code>https://champion-tennis.ru/rss.xml</code></li>
+            <li><a href="/robots.txt" target="_blank" style="font-weight: 700; color: #0f172a;">Файл robots.txt</a> — <code>https://champion-tennis.ru/robots.txt</code></li>
           </ul>
         </div>
 

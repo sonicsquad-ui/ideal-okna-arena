@@ -10,7 +10,7 @@
     <div>
       <h2 class="admin-card-title">Журнал всех заявок с форм (<%= submissions.length %>)</h2>
       <p style="font-size: 0.8125rem; color: #64748b; margin-top: 2px;">
-        Каждая заявка автоматически дублируется на почту администратора <strong>sonicsquad@mail.ru</strong> (на самом сайте адрес скрыт от спам-ботов).
+        Каждая заявка автоматически дублируется на почту администратора <strong>sonicsquad@mail.ru</strong> (на самом сайте адрес строго скрыт).
       </p>
     </div>
   </div>
@@ -28,9 +28,9 @@
           <th>Тип формы</th>
           <th>Имя</th>
           <th>Контактные данные</th>
-          <th>Тема / Запрос</th>
-          <th>Страница отправки</th>
-          <th>Маршрутизация почты</th>
+          <th>Тема и сообщение</th>
+          <th>Статус</th>
+          <th>Действия</th>
         </tr>
       </thead>
       <tbody>
@@ -45,21 +45,36 @@
             </td>
             <td><strong><%= sub.name || 'Подписчик' %></strong></td>
             <td><code style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px;"><%= sub.contact_info %></code></td>
-            <td>
-              <strong><%= sub.subject || '—' %></strong>
+            <td style="max-width: 320px; word-break: break-word;">
+              <strong><%= sub.subject || '' %></strong>
               <% if (sub.message) { %>
-                <div style="font-size: 0.775rem; color: #64748b; margin-top: 4px; max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                <div style="font-size: 0.775rem; color: #64748b; margin-top: 4px;">
                   <%= sub.message %>
                 </div>
               <% } %>
             </td>
-            <td style="font-size: 0.75rem; color: #94a3b8; max-width: 150px; overflow: hidden; text-overflow: ellipsis;">
-              <%= sub.source_url || '—' %>
+            <td>
+              <% if (sub.status === 'processed') { %>
+                <span style="background: #dcfce7; color: #15803d; font-weight: 800; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem;">
+                  ✔ Обработано
+                </span>
+              <% } else { %>
+                <span style="background: #fef3c7; color: #92400e; font-weight: 800; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem;">
+                  Новая
+                </span>
+              <% } %>
             </td>
             <td>
-              <span style="color: #16a34a; font-weight: 700; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 4px;">
-                ✔ Отправлено на sonicsquad@mail.ru
-              </span>
+              <div style="display: flex; gap: 6px;">
+                <% if (sub.status !== 'processed') { %>
+                  <a href="/admin/submissions/process/<%= sub.id %>" class="btn-admin btn-admin-success btn-admin-sm" title="Пометить как обработанную">
+                    ✔ Обработано
+                  </a>
+                <% } %>
+                <a href="/admin/submissions/delete/<%= sub.id %>" class="btn-admin btn-admin-danger btn-admin-sm" onclick="return confirm('Удалить эту заявку полностью?')" title="Удалить">
+                  🗑️
+                </a>
+              </div>
             </td>
           </tr>
         <% }); %>

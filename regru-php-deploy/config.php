@@ -14,11 +14,17 @@ try {
     $pdo = new PDO('sqlite:' . $dbPath);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+
+    // Регистрируем функцию нечувствительного к регистру поиска по-русски
+    $pdo->sqliteCreateFunction('ru_like', function($haystack, $needle) {
+        if (!$haystack || !$needle) return 0;
+        return (mb_stripos($haystack, $needle, 0, 'UTF-8') !== false) ? 1 : 0;
+    }, 2);
 } catch (PDOException $e) {
     die("Ошибка подключения к базе данных. Проверьте права на чтение/запись папки data/: " . htmlspecialchars($e->getMessage()));
 }
 
-// Почта для уведомлений о заявках (скрыта от публичной части сайта)
+// Почта для уведомлений о заявках (строго скрыта от публичной части сайта)
 define('TARGET_EMAIL', 'sonicsquad@mail.ru');
 
 // Отправка email через стандартную функцию mail() хостинга REG.RU
@@ -57,16 +63,16 @@ function transliterate($str) {
     return trim($res, '-');
 }
 
-function formatDateRu($dateStr) {
-    if (!$dateStr) return '';
+// Точный формат даты и времени по ТЗ: ДД.ММ.ГГГГ ЧЧ:ММ
+function formatNewsDate($dateStr) {
+    if (!$dateStr) return date('d.m.Y H:i');
     $timestamp = strtotime($dateStr);
     if (!$timestamp) return $dateStr;
-    $months = [
-        1=>'янв', 2=>'фев', 3=>'мар', 4=>'апр', 5=>'мая', 6=>'июн',
-        7=>'июл', 8=>'авг', 9=>'сен', 10=>'окт', 11=>'ноя', 12=>'дек'
-    ];
-    $m = (int)date('n', $timestamp);
-    return date('j ', $timestamp) . (isset($months[$m]) ? $months[$m] : '') . date(' Y, H:i', $timestamp);
+    return date('d.m.Y H:i', $timestamp);
+}
+
+function formatDateRu($dateStr) {
+    return formatNewsDate($dateStr);
 }
 
 function getGlobalSettings($pdo) {

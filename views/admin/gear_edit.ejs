@@ -1,0 +1,68 @@
+<%- include('./admin_layout_header', { 
+  adminTitle: isEdit ? 'Редактирование экипировки' : 'Новая модель', 
+  activeTab: 'gear', 
+  pageHeader: isEdit ? 'Редактирование: ' + gearItem.title : 'Добавление новой модели экипировки',
+  stats: stats 
+}) %>
+
+<div class="admin-card">
+  <form action="/admin/gear/save" method="POST">
+    <input type="hidden" name="id" value="<%= isEdit ? gearItem.id : 0 %>">
+
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 16px;">
+      <div class="form-group">
+        <label class="form-label">Название модели (H1):</label>
+        <input type="text" name="title" class="form-control" value="<%= isEdit ? gearItem.title : '' %>" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Бренд:</label>
+        <input type="text" name="brand" class="form-control" value="<%= isEdit ? gearItem.brand : 'Wilson' %>" required>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
+      <div class="form-group">
+        <label class="form-label">URL Slug:</label>
+        <input type="text" name="slug" class="form-control" value="<%= isEdit ? gearItem.slug : '' %>" placeholder="avto-translit">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Категория:</label>
+        <select name="category" class="form-control">
+          <option value="rackets" <%= (isEdit && gearItem.category === 'rackets') ? 'selected' : '' %>>Ракетки</option>
+          <option value="padel" <%= (isEdit && gearItem.category === 'padel') ? 'selected' : '' %>>Падел ракетки</option>
+          <option value="strings" <%= (isEdit && gearItem.category === 'strings') ? 'selected' : '' %>>Струны</option>
+          <option value="shoes" <%= (isEdit && gearItem.category === 'shoes') ? 'selected' : '' %>>Кроссовки</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Цена:</label>
+        <input type="text" name="price" class="form-control" value="<%= isEdit ? gearItem.price : '28 900 ₽' %>">
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 16px;">
+      <div class="form-group">
+        <label class="form-label">Рейтинг (0-10):</label>
+        <input type="number" step="0.1" name="rating" class="form-control" value="<%= isEdit ? gearItem.rating : 9.5 %>">
+      </div>
+      <div class="form-group">
+        <label class="form-label">URL фото:</label>
+        <input type="text" name="image" class="form-control" value="<%= isEdit ? gearItem.image : '/images/gear-rackets.jpg' %>">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Экспертный обзор и характеристики (WYSIWYG TinyMCE + кнопка кода):</label>
+      <textarea name="content" class="wysiwyg-editor"><%= isEdit ? gearItem.content : '' %></textarea>
+    </div>
+
+    <div style="display: flex; gap: 12px; margin-top: 24px;">
+      <button type="submit" class="btn-admin btn-admin-primary" style="padding: 12px 28px; font-size: 1rem;">
+        💾 Сохранить экипировку
+      </button>
+      <a href="/admin/gear" class="btn-admin btn-admin-secondary">Отмена</a>
+    </div>
+  </form>
+</div>
+
+<%- include('./admin_layout_footer') %>

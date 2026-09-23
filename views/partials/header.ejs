@@ -11,7 +11,7 @@
       <div class="ticker-right">
         <span class="header-date">
           <svg style="width:13px; height:13px; vertical-align:-1px; margin-right:4px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-          22 сентября 2026, Москва
+          23 сентября 2026, Москва
         </span>
         <div class="top-socials">
           <a href="https://t.me/champion_tennis_ru" target="_blank" rel="noopener" class="top-social-link" title="Telegram-канал">
@@ -30,10 +30,9 @@
 
   <!-- Main header line -->
   <div class="container main-header-row">
-    <!-- Brand Logo -->
+    <!-- Brand Logo (Пункт 6: только ЧЕМПИОН-ТЕННИС без домена) -->
     <a href="/" class="brand-logo" title="На главную Champion-Tennis.ru">
       <div class="brand-crest" style="width:44px; height:44px; min-width:44px; min-height:44px; max-width:44px; max-height:44px; overflow:hidden;">
-        <!-- SVG Tennis Ball & Crest -->
         <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:26px; height:26px; max-width:26px; max-height:26px; display:block;">
           <circle cx="12" cy="12" r="10" stroke="#ccff00" stroke-width="2"/>
           <path d="M4.93 4.93c4.2 4.2 4.2 10.94 0 15.14" stroke="#ffffff" stroke-width="1.8"/>
@@ -42,7 +41,6 @@
       </div>
       <div class="brand-text">
         <div class="brand-name">Чемпион-<span>Теннис</span></div>
-        <div class="brand-domain">CHAMPION-TENNIS.RU</div>
       </div>
     </a>
 
@@ -53,30 +51,29 @@
       <a href="/rankings" class="nav-link <%= typeof activeNav !== 'undefined' && activeNav === 'rankings' ? 'active' : '' %>">Рейтинги ATP/WTA</a>
       <a href="/players" class="nav-link <%= typeof activeNav !== 'undefined' && activeNav === 'players' ? 'active' : '' %>">Игроки</a>
       <a href="/blog" class="nav-link <%= typeof activeNav !== 'undefined' && activeNav === 'blog' ? 'active' : '' %>">Аналитика и Блог</a>
-      <a href="/gear" class="nav-link <%= typeof activeNav !== 'undefined' && activeNav === 'gear' ? 'active' : '' %>">Экипировка и Падел</a>
+      <a href="/gear" class="nav-link <%= typeof activeNav !== 'undefined' && activeNav === 'gear' ? 'active' : '' %>">Экипировка 2026</a>
       <a href="/about" class="nav-link <%= typeof activeNav !== 'undefined' && activeNav === 'about' ? 'active' : '' %>">О проекте</a>
     </nav>
 
-    <!-- Header Actions (Search & Admin Button) -->
+    <!-- Header Actions (Пункт 5: удалена кнопка Админка; Пункт 4: работающий поиск; Пункт 17: гамбургер) -->
     <div class="header-actions">
       <button class="search-btn-trigger js-search-trigger" type="button" aria-label="Сквозной поиск по сайту">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
         <span>Поиск по сайту</span>
       </button>
 
-      <a href="/admin" class="admin-header-btn" title="Панель управления">
-        <svg style="width:14px; height:14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-        <span>Админка</span>
-      </a>
-
-      <!-- Mobile Hamburger Button -->
+      <!-- Mobile Hamburger Button (Пункт 17) -->
       <button class="mobile-menu-toggle" id="mobileMenuToggle" type="button" aria-label="Открыть мобильное меню">
-        <svg style="width:26px; height:26px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
       </button>
     </div>
   </div>
 
-  <!-- Subnav Category Bar (gotennis.ru / tennisbb.ru style) -->
+  <!-- Subnav Category Bar (Пункт 15: фильтрация новостей по категориям) -->
   <div class="category-subnav">
     <div class="container subnav-inner">
       <a href="/news" class="subnav-item <%= typeof activeCategory !== 'undefined' && activeCategory === 'all' ? 'active' : '' %>">Все новости</a>
@@ -102,12 +99,12 @@
   </div>
 </header>
 
-<!-- Mobile Navigation Drawer -->
+<!-- Mobile Navigation Drawer (Пункт 17) -->
 <div class="drawer-overlay" id="drawerOverlay"></div>
 <aside class="mobile-drawer" id="mobileDrawer">
   <div class="mobile-drawer-header">
     <div class="brand-name" style="font-size:1.15rem;">Чемпион-<span>Теннис</span></div>
-    <button id="mobileDrawerClose" style="background:none; border:none; font-size:1.25rem; cursor:pointer;">&times;</button>
+    <button id="mobileDrawerClose" style="background:none; border:none; font-size:1.6rem; cursor:pointer; color:#0f172a; padding:4px 8px;">&times;</button>
   </div>
   <nav class="mobile-drawer-nav">
     <a href="/" class="drawer-link">Главная страница</a>
@@ -117,15 +114,14 @@
     <a href="/news/grand-slam" class="drawer-link" style="padding-left:24px;">— Большой шлем</a>
     <a href="/news/team-russia" class="drawer-link" style="padding-left:24px;">— Сборная России</a>
     <a href="/news/padel-pickleball" class="drawer-link" style="padding-left:24px;">— Падел и Пиклбол</a>
-    <a href="/tournaments" class="drawer-link">Турниры и календарь</a>
+    <a href="/tournaments" class="drawer-link">Турниры и календарь 2026</a>
     <a href="/rankings" class="drawer-link">Рейтинги ATP / WTA</a>
-    <a href="/players" class="drawer-link">Игроки и H2H</a>
+    <a href="/players" class="drawer-link">Игроки мирового тура</a>
     <a href="/blog" class="drawer-link">Аналитика и Блог</a>
-    <a href="/gear" class="drawer-link">Экипировка и Ракетки</a>
+    <a href="/gear" class="drawer-link">Ракетки и Экипировка 2026</a>
     <a href="/glossary" class="drawer-link">Глоссарий терминов</a>
     <a href="/about" class="drawer-link">О проекте и Редакция</a>
     <a href="/contacts" class="drawer-link">Контакты и Реклама</a>
-    <hr style="border:0; border-top:1px solid #e2e8f0; margin:8px 0;">
-    <a href="/admin" class="drawer-link" style="color:var(--primary); font-weight:700;">Вход в Админ-панель</a>
+    <a href="/sitemap" class="drawer-link">Карта сайта</a>
   </nav>
 </aside>

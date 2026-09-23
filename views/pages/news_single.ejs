@@ -23,23 +23,24 @@
 
         <h1 class="article-title-main"><%= newsItem.title %></h1>
 
-        <div class="article-meta-bar">
+        <div class="article-meta-bar" style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
           <div class="article-author-info">
-            <div class="author-name-text">Автор: <%= newsItem.author %></div>
+            <span style="font-weight: 700;">Автор: <%= newsItem.author %></span>
             <span style="color: #cbd5e1;">•</span>
-            <div>Опубликовано: <%= newsItem.published_at_formatted %> (МСК)</div>
+            <!-- Формат ДД.ММ.ГГГГ ЧЧ:ММ (Пункт 3) -->
+            <span><strong>📅 <%= newsItem.published_at_formatted %></strong> (МСК)</span>
           </div>
-          <div style="display: flex; gap: 14px; align-items: center;">
+          <div>
             <span>👁️ <strong><%= newsItem.views %></strong> просмотров</span>
           </div>
         </div>
       </header>
 
       <% if (newsItem.image) { %>
-        <img src="<%= newsItem.image %>" alt="<%= newsItem.title %>" class="article-hero-cover">
+        <img src="<%= newsItem.image %>" alt="<%= newsItem.title %>" class="article-hero-cover" style="width: 100%; border-radius: 8px; margin: 20px 0; max-height: 480px; object-fit: cover;">
       <% } %>
 
-      <div class="article-content">
+      <div class="article-content" style="font-size: 1.05rem; line-height: 1.75; color: #1e293b;">
         <!-- Short excerpt lead -->
         <p style="font-size: 1.15rem; font-weight: 600; color: #334155; line-height: 1.6; border-left: 4px solid var(--primary); padding-left: 14px; margin-bottom: 24px;">
           <%= newsItem.excerpt %>
@@ -49,41 +50,45 @@
         <%- newsItem.content %>
       </div>
 
-      <!-- Social sharing & Logical Cross-linking -->
-      <div class="article-sharing-bar">
+      <!-- Social sharing -->
+      <div class="article-sharing-bar" style="margin-top: 36px; padding: 16px; background: #f8fafc; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
         <div style="font-weight: 700; font-size: 0.875rem; color: #334155;">Поделиться материалом:</div>
-        <div class="social-share-buttons">
-          <a href="https://t.me/share/url?url=<%= encodeURIComponent('https://champion-tennis.ru/news/' + newsItem.category + '/' + newsItem.slug) %>&text=<%= encodeURIComponent(newsItem.title) %>" target="_blank" rel="noopener" class="share-btn">
+        <div class="social-share-buttons" style="display: flex; gap: 10px;">
+          <a href="https://t.me/share/url?url=<%= encodeURIComponent('https://champion-tennis.ru/news/' + newsItem.category + '/' + newsItem.slug) %>&text=<%= encodeURIComponent(newsItem.title) %>" target="_blank" rel="noopener" class="share-btn" style="padding: 6px 14px; background: #0284c7; color: white; border-radius: 6px; text-decoration: none; font-size: 0.8125rem; font-weight: 700;">
             <span>✈️ Telegram</span>
           </a>
-          <a href="https://vk.com/share.php?url=<%= encodeURIComponent('https://champion-tennis.ru/news/' + newsItem.category + '/' + newsItem.slug) %>" target="_blank" rel="noopener" class="share-btn">
+          <a href="https://vk.com/share.php?url=<%= encodeURIComponent('https://champion-tennis.ru/news/' + newsItem.category + '/' + newsItem.slug) %>" target="_blank" rel="noopener" class="share-btn" style="padding: 6px 14px; background: #4f46e5; color: white; border-radius: 6px; text-decoration: none; font-size: 0.8125rem; font-weight: 700;">
             <span>🔵 ВКонтакте</span>
           </a>
-          <a href="https://api.whatsapp.com/send?text=<%= encodeURIComponent(newsItem.title + ' https://champion-tennis.ru/news/' + newsItem.category + '/' + newsItem.slug) %>" target="_blank" rel="noopener" class="share-btn">
-            <span>🟢 WhatsApp</span>
-          </a>
-          <button type="button" class="share-btn js-copy-link">
+          <button type="button" class="share-btn js-copy-link" style="padding: 6px 14px; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 6px; cursor: pointer; font-size: 0.8125rem; font-weight: 600;">
             <span>🔗 Скопировать ссылку</span>
           </button>
         </div>
       </div>
 
-      <!-- Logical Interlinking: Related News -->
+      <!-- Блок «Еще новости» (Пункт 3: надпись «Еще новости» и 3 последние новости в виде карточек с фото и датой) -->
       <% if (relatedNews && relatedNews.length > 0) { %>
-        <div style="margin-top: 40px; padding-top: 28px; border-top: 2px solid var(--border);">
-          <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 18px; color: var(--text-main);">
-            Читайте также по теме:
+        <div class="more-news-section" style="margin-top: 40px; padding-top: 28px; border-top: 2px solid var(--border);">
+          <h3 style="font-size: 1.35rem; font-weight: 800; margin-bottom: 20px; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
+            <span style="display:inline-block; width:6px; height:24px; background:var(--primary); border-radius:3px;"></span>
+            Еще новости
           </h3>
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px;">
             <% relatedNews.forEach(function(rel) { %>
-              <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 14px;">
-                <div style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 4px;">
-                  <%= rel.published_at_formatted %>
-                </div>
-                <a href="/news/<%= rel.category %>/<%= rel.slug %>" style="font-weight: 700; font-size: 0.9375rem; color: var(--text-main); line-height: 1.35; display: block;">
-                  <%= rel.title %>
+              <article class="news-card-featured" style="margin: 0;">
+                <a href="/news/<%= rel.category %>/<%= rel.slug %>" class="news-card-img-wrap" style="aspect-ratio: 16/10;">
+                  <img src="<%= rel.image || '/images/hero-tennis-ball.jpg' %>" alt="<%= rel.title %>">
+                  <span class="category-tag <%= rel.category %>"><%= rel.category.toUpperCase() %></span>
                 </a>
-              </div>
+                <div class="news-card-body">
+                  <div style="font-size: 0.775rem; color: #64748b; margin-bottom: 4px; font-weight: 600;">
+                    📅 <%= rel.published_at_formatted %>
+                  </div>
+                  <h4 class="news-card-title" style="font-size: 0.95rem;">
+                    <a href="/news/<%= rel.category %>/<%= rel.slug %>"><%= rel.title %></a>
+                  </h4>
+                </div>
+              </article>
             <% }); %>
           </div>
         </div>
