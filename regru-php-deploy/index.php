@@ -104,6 +104,43 @@ function resolveImg($path) {
     return $path;
 }
 
+
+// Генератор блока шаринга в соцсети и мессенджеры (Требование 9)
+function renderShareBlock($url, $title, $type = 'материалом') {
+    $encUrl = urlencode($url);
+    $encTitle = urlencode($title);
+    $safeUrl = htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
+    $safeTitle = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
+    $jsSafeTitle = htmlspecialchars(addslashes($title), ENT_QUOTES, 'UTF-8');
+
+    return '
+    <div class="article-sharing-bar">
+      <div class="sharing-label">
+        <svg style="width:18px; height:18px; stroke:#0a5c36; fill:none; display:inline-block; vertical-align:-3px; margin-right:4px;" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+        <span>Поделиться ' . htmlspecialchars($type) . ':</span>
+      </div>
+      <div class="social-share-buttons">
+        <a href="https://t.me/share/url?url=' . $encUrl . '&text=' . $encTitle . '" target="_blank" rel="noopener" class="share-btn share-btn-tg" title="Поделиться в Telegram">✈️ Telegram</a>
+        <a href="https://vk.com/share.php?url=' . $encUrl . '&title=' . $encTitle . '" target="_blank" rel="noopener" class="share-btn share-btn-vk" title="Поделиться во ВКонтакте">🔵 ВКонтакте</a>
+        <a href="https://connect.ok.ru/offer?url=' . $encUrl . '&title=' . $encTitle . '" target="_blank" rel="noopener" class="share-btn share-btn-ok" title="Поделиться в Одноклассниках">🟠 Одноклассники</a>
+        <a href="https://connect.mail.ru/share?url=' . $encUrl . '&title=' . $encTitle . '" target="_blank" rel="noopener" class="share-btn share-btn-mm" title="Поделиться в Мой Мир">🔴 Мой Мир</a>
+        <button type="button" class="share-btn share-btn-max" onclick="shareToMax('' . $safeUrl . '', '' . $jsSafeTitle . '')" title="Поделиться в MAX мессенджер">💬 MAX</button>
+        <button type="button" class="share-btn share-btn-copy js-copy-link" onclick="copyPageUrl(this, '' . $safeUrl . '')" title="Скопировать ссылку в буфер обмена">🔗 Скопировать ссылку</button>
+      </div>
+    </div>';
+}
+
+// Генератор обязательного чекбокса согласия с политикой обработки данных (Требование 1)
+function renderFormAgreementCheckbox($suffix = 'main') {
+    return '
+    <div class="form-agree-wrap">
+      <input type="checkbox" name="agree" class="form-agree-checkbox" id="agreeCheckbox_' . htmlspecialchars($suffix) . '" required>
+      <label for="agreeCheckbox_' . htmlspecialchars($suffix) . '">
+        Нажимая кнопку, вы соглашаетесь с <a href="/privacy-policy" target="_blank">Политикой обработки данных</a>.
+      </label>
+    </div>';
+}
+
 // ==========================================
 // API & RSS & Sitemap Endpoints
 // ==========================================
@@ -150,10 +187,16 @@ if ($route === 'sitemap.xml') {
     exit;
 }
 
-// API: Subscribe
+// API: Subscribe (устойчивое чтение POST, JSON и URL-encoded параметров)
 if ($route === 'api' && $subRoute === 'subscribe') {
-    header('Content-Type: application/json');
-    $input = json_decode(file_get_contents('php://input'), true) ?: $_POST;
+    header('Content-Type: application/json; charset=utf-8');
+    $raw = @file_get_contents('php://input');
+    $json = $raw ? @json_decode($raw, true) : null;
+    $input = array_merge(
+        is_array($_POST) ? $_POST : [],
+        is_array($_REQUEST) ? $_REQUEST : [],
+        is_array($json) ? $json : []
+    );
     $email = trim($input['email'] ?? '');
     if ($email && strpos($email, '@')) {
         $stmt = $pdo->prepare("INSERT INTO form_submissions (form_type, name, contact_info, subject, message, source_url, status) VALUES ('newsletter', 'Подписчик дайджеста', ?, 'Подписка на утренний дайджест', 'Email рассылка 8:00', ?, 'new')");
@@ -166,62 +209,155 @@ if ($route === 'api' && $subRoute === 'subscribe') {
     exit;
 }
 
-// API: Contact
+// API: Contact (устойчивое чтение POST, JSON и URL-encoded параметров — Требование 1)
 if ($route === 'api' && $subRoute === 'contact') {
-    header('Content-Type: application/json');
-    $input = json_decode(file_get_contents('php://input'), true) ?: $_POST;
+    header('Content-Type: application/json; charset=utf-8');
+    $raw = @file_get_contents('php://input');
+    $json = $raw ? @json_decode($raw, true) : null;
+    $input = array_merge(
+        is_array($_POST) ? $_POST : [],
+        is_array($_REQUEST) ? $_REQUEST : [],
+        is_array($json) ? $json : []
+    );
     $name = trim($input['name'] ?? '');
-    $contact = trim($input['contact'] ?? '');
-    $msg = trim($input['message'] ?? '');
+    $contact = trim($input['contact'] ?? $input['email'] ?? $input['phone'] ?? '');
+    $msg = trim($input['message'] ?? $input['msg'] ?? $input['text'] ?? '');
     $subject = trim($input['subject'] ?? 'Обращение с сайта');
     $formType = trim($input['form_type'] ?? 'Форма обратной связи');
-    if ($contact && $msg) {
+    $pageUrl = trim($input['pageUrl'] ?? $input['source_url'] ?? $_SERVER['HTTP_REFERER'] ?? '');
+
+    if (!empty($contact) && !empty($msg)) {
         $stmt = $pdo->prepare("INSERT INTO form_submissions (form_type, name, contact_info, subject, message, source_url, status) VALUES (?, ?, ?, ?, ?, ?, 'new')");
-        $stmt->execute([$formType, $name ?: 'Пользователь сайта', $contact, $subject, $msg, $input['pageUrl'] ?? '']);
-        sendAdminNotification("[Champion-Tennis.ru] Новое обращение: " . $subject, "Имя: $name\nКонтакт: $contact\nТема: $subject\nФорма: $formType\n\nСообщение:\n$msg\n\nСтраница отправки: " . ($input['pageUrl'] ?? ''));
-        echo json_encode(['success' => true]);
+        $stmt->execute([$formType, $name ?: 'Пользователь сайта', $contact, $subject, $msg, $pageUrl]);
+        sendAdminNotification("[Champion-Tennis.ru] Новое обращение: " . $subject, "Имя: $name\nКонтакт: $contact\nТема: $subject\nФорма: $formType\n\nСообщение:\n$msg\n\nСтраница отправки: " . $pageUrl);
+        echo json_encode(['success' => true, 'message' => 'Ваше обращение успешно отправлено!']);
     } else {
-        echo json_encode(['success' => false, 'error' => 'Заполните обязательные поля']);
+        echo json_encode(['success' => false, 'error' => 'Заполните обязательные поля: контакт для связи и сообщение']);
     }
     exit;
 }
 
-// API: Search
+// API: Search (Сквозной поиск по всем разделам, страницам, новостям, статьям и игрокам — Требование 3)
 if ($route === 'api' && $subRoute === 'search') {
-    header('Content-Type: application/json');
+    header('Content-Type: application/json; charset=utf-8');
     $q = trim($_GET['q'] ?? '');
     $results = [];
     if (mb_strlen($q) >= 2) {
-        $stNews = $pdo->prepare("SELECT title, category, slug, published_at FROM news WHERE ru_like(title, ?) = 1 OR ru_like(excerpt, ?) = 1 LIMIT 5");
+        $qLower = mb_strtolower($q, 'UTF-8');
+
+        // 1. Полнотекстовый поиск по всем ключевым разделам и страницам сайта
+        $systemPages = [
+            ['title' => 'Новости тенниса', 'type_label' => 'Раздел', 'url' => '/news', 'keys' => ['новости', 'лента новостей', 'теннисные новости', 'новости спорта', 'news', 'лента'], 'desc' => 'Главные события российского и мирового тенниса, туры ATP и WTA'],
+            ['title' => 'ATP Тур (Мужчины)', 'type_label' => 'Раздел', 'url' => '/news/atp', 'keys' => ['atp', 'атп', 'мужской теннис', 'мужчины'], 'desc' => 'Новости и результаты матчей мужского тура ATP'],
+            ['title' => 'WTA Тур (Женщины)', 'type_label' => 'Раздел', 'url' => '/news/wta', 'keys' => ['wta', 'вта', 'женский теннис', 'женщины'], 'desc' => 'Новости и результаты матчей женского тура WTA'],
+            ['title' => 'Большой шлем (Grand Slam)', 'type_label' => 'Раздел', 'url' => '/news/grand-slam', 'keys' => ['шлем', 'большой шлем', 'grand slam', 'уимблдон', 'ролан гаррос', 'us open', 'australian open', 'мэйджор'], 'desc' => 'Турниры Большого шлема'],
+            ['title' => 'Сборная России и РТТ', 'type_label' => 'Раздел', 'url' => '/news/team-russia', 'keys' => ['россия', 'сборная', 'ртт', 'российский теннис', 'team russia', 'кубок кремля'], 'desc' => 'Сборная России и национальный тур РТТ'],
+            ['title' => 'Падел и Пиклбол', 'type_label' => 'Раздел', 'url' => '/news/padel-pickleball', 'keys' => ['падел', 'пиклбол', 'падл', 'padel', 'pickleball'], 'desc' => 'Развитие падела и пиклбола в России и мире'],
+            ['title' => 'Аналитика и Блог о теннисе', 'type_label' => 'Раздел', 'url' => '/blog', 'keys' => ['блог', 'аналитика', 'статьи', 'разборы', 'авторские материалы', 'мнения', 'blog', 'колонка', 'статья'], 'desc' => 'Авторские статьи экспертов, тактические разборы и исторические хроники'],
+            ['title' => 'Календарь теннисных турниров 2026', 'type_label' => 'Раздел', 'url' => '/tournaments', 'keys' => ['турниры', 'календарь', 'расписание', 'турнирная сетка', 'сетка', 'мастерс', 'tournaments', 'турнир'], 'desc' => 'Календарь турниров Большого шлема, Мастерс 1000 и соревнований в РФ'],
+            ['title' => 'Официальные рейтинги ATP и WTA', 'type_label' => 'Раздел', 'url' => '/rankings', 'keys' => ['рейтинг', 'рейтинги', 'топ', 'ранкинг', 'rankings', 'очки', 'первая ракетка', 'таблица'], 'desc' => 'Официальная таблица очков мирового рейтинга теннисистов и теннисисток'],
+            ['title' => 'Звезды тенниса и профили игроков', 'type_label' => 'Раздел', 'url' => '/players', 'keys' => ['игроки', 'теннисисты', 'теннисистки', 'профили', 'игрок', 'players', 'биографии'], 'desc' => 'Досье, статистика и достижения ведущих российских и мировых спортсменов'],
+            ['title' => 'Ракетки и Экипировка 2026', 'type_label' => 'Раздел', 'url' => '/gear', 'keys' => ['экипировка', 'ракетки', 'струны', 'кроссовки', 'мячи', 'gear', 'обзоры ракеток', 'wilson', 'babolat', 'head', 'yonex', 'ракетка'], 'desc' => 'Гид по выбору профессиональных ракеток, струн и обуви для корта'],
+            ['title' => 'Глоссарий теннисных терминов', 'type_label' => 'Справочник', 'url' => '/glossary', 'keys' => ['глоссарий', 'термины', 'словарь', 'тай-брейк', 'эйс', 'брейк', 'слайс', 'glossary', 'термин'], 'desc' => 'Справочник профессиональной терминологии и правил судейства'],
+            ['title' => 'О проекте и Редакция', 'type_label' => 'Страница', 'url' => '/about', 'keys' => ['о проекте', 'редакция', 'о нас', 'команда', 'журналисты', 'авторы', 'миссия', 'about', 'проект'], 'desc' => 'Информация о спортивном портале Champion-Tennis.ru и составе редакции'],
+            ['title' => 'Контакты и Размещение Рекламы', 'type_label' => 'Страница', 'url' => '/contacts', 'keys' => ['контакты', 'реклама', 'связь', 'размещение рекламы', 'сотрудничество', 'contacts', 'контакт'], 'desc' => 'Контакты дежурного редактора и коммерческого отдела'],
+            ['title' => 'Правила пользования сайтом', 'type_label' => 'Документ', 'url' => '/site-rules', 'keys' => ['правила', 'правила сайта', 'правила пользования', 'site rules', 'модерация', 'комментарии', 'правило'], 'desc' => 'Регламент поведения на сайте, цитирования и публикации материалов'],
+            ['title' => 'Пользовательское соглашение', 'type_label' => 'Документ', 'url' => '/user-agreement', 'keys' => ['соглашение', 'пользовательское соглашение', 'условия', 'user agreement'], 'desc' => 'Официальное пользовательское соглашение портала'],
+            ['title' => 'Политика конфиденциальности (152-ФЗ)', 'type_label' => 'Документ', 'url' => '/privacy-policy', 'keys' => ['политика', 'конфиденциальность', '152-фз', 'персональные данные', 'обработка данных', 'privacy policy'], 'desc' => 'Политика обработки и защиты персональных данных пользователей'],
+            ['title' => 'Карта сайта', 'type_label' => 'Страница', 'url' => '/sitemap', 'keys' => ['карта сайта', 'навигация', 'sitemap', 'все разделы', 'карта'], 'desc' => 'Полная иерархическая карта разделов и материалов портала']
+        ];
+
+        foreach ($systemPages as $sp) {
+            $matched = false;
+            if (mb_stripos($sp['title'], $q, 0, 'UTF-8') !== false || mb_stripos($sp['desc'], $q, 0, 'UTF-8') !== false) {
+                $matched = true;
+            } else {
+                foreach ($sp['keys'] as $k) {
+                    if (mb_stripos($k, $qLower, 0, 'UTF-8') !== false || mb_stripos($qLower, $k, 0, 'UTF-8') !== false) {
+                        $matched = true;
+                        break;
+                    }
+                }
+            }
+            if ($matched) {
+                $results[] = [
+                    'title' => $sp['title'],
+                    'type_label' => $sp['type_label'],
+                    'url' => $sp['url'],
+                    'desc' => $sp['desc'],
+                    'date' => 'Раздел'
+                ];
+            }
+        }
+
+        // 2. Поиск по динамическим страницам pages (custom pages)
+        $stPages = $pdo->prepare("SELECT title, slug FROM pages WHERE ru_like(title, ?) = 1 OR ru_like(content, ?) = 1 LIMIT 3");
+        $stPages->execute([$q, $q]);
+        while ($r = $stPages->fetch()) {
+            $already = false;
+            foreach ($results as $resItem) {
+                if ($resItem['url'] === '/' . $r['slug']) { $already = true; break; }
+            }
+            if (!$already) {
+                $results[] = [
+                    'title' => $r['title'],
+                    'type_label' => 'Страница',
+                    'url' => '/' . $r['slug'],
+                    'desc' => 'Системная страница портала',
+                    'date' => 'Инфо'
+                ];
+            }
+        }
+
+        // 3. Новости
+        $stNews = $pdo->prepare("SELECT title, category, slug, published_at FROM news WHERE ru_like(title, ?) = 1 OR ru_like(excerpt, ?) = 1 LIMIT 6");
         $stNews->execute([$q, $q]);
         while ($r = $stNews->fetch()) {
             $results[] = [
                 'title' => $r['title'],
                 'type_label' => 'Новость',
                 'url' => '/news/' . $r['category'] . '/' . $r['slug'],
+                'desc' => '',
                 'date' => formatNewsDate($r['published_at'])
             ];
         }
 
-        $stArt = $pdo->prepare("SELECT title, category, slug, published_at FROM articles WHERE ru_like(title, ?) = 1 OR ru_like(excerpt, ?) = 1 LIMIT 4");
+        // 4. Статьи блога
+        $stArt = $pdo->prepare("SELECT title, category, slug, published_at FROM articles WHERE ru_like(title, ?) = 1 OR ru_like(excerpt, ?) = 1 LIMIT 5");
         $stArt->execute([$q, $q]);
         while ($r = $stArt->fetch()) {
             $results[] = [
                 'title' => $r['title'],
                 'type_label' => 'Блог',
                 'url' => '/blog/' . $r['category'] . '/' . $r['slug'],
+                'desc' => '',
                 'date' => formatNewsDate($r['published_at'])
             ];
         }
 
-        $stPlay = $pdo->prepare("SELECT name, slug, country FROM players WHERE ru_like(name, ?) = 1 LIMIT 3");
+        // 5. Игроки
+        $stPlay = $pdo->prepare("SELECT name, slug, country, current_rank FROM players WHERE ru_like(name, ?) = 1 LIMIT 3");
         $stPlay->execute([$q]);
         while ($r = $stPlay->fetch()) {
             $results[] = [
-                'title' => $r['name'] . ' (' . $r['country'] . ')',
+                'title' => $r['name'] . ' (' . $r['country'] . ') — №' . $r['current_rank'],
                 'type_label' => 'Игрок',
                 'url' => '/players',
+                'desc' => 'Профиль теннисиста мирового тура',
                 'date' => 'Рейтинг'
+            ];
+        }
+
+        // 6. Экипировка
+        $stGear = $pdo->prepare("SELECT brand, title, price, slug FROM gear_reviews WHERE ru_like(brand, ?) = 1 OR ru_like(title, ?) = 1 LIMIT 3");
+        $stGear->execute([$q, $q]);
+        while ($r = $stGear->fetch()) {
+            $results[] = [
+                'title' => $r['brand'] . ' ' . $r['title'] . ' (' . $r['price'] . ')',
+                'type_label' => 'Экипировка',
+                'url' => '/gear',
+                'desc' => 'Обзор и характеристики ракетки',
+                'date' => 'Тест'
             ];
         }
     }
@@ -233,45 +369,152 @@ if ($route === 'api' && $subRoute === 'search') {
 // Определение Meta тегов страниц (Пункт 14)
 // ==========================================
 function getPageMeta($route, $subRoute, $subSubRoute, $pdo) {
+    global $rawUrl;
+    $canonical = '/' . trim($rawUrl, '/');
+    $image = '/images/hero-tennis-ball.jpg';
+    $type = 'website';
+    $schema = null;
+
     if ($route === '' || $route === 'index') {
+        $canonical = '/';
         return [
             'title' => 'Теннис: новости российского и мирового тенниса, результаты, календарь турниров 2026, новости спорта, рейтинги, статьи - Чемпион-Теннис',
-            'desc' => 'Спортивный портал тенниса России Чемпион-Теннис: новости тенниса и спорта, расписание турниров, рейтинги, аналитика, статьи.'
+            'desc' => 'Спортивный портал тенниса России Чемпион-Теннис: новости тенниса и спорта, расписание турниров, рейтинги, аналитика, статьи.',
+            'image' => '/images/hero-tennis-ball.jpg',
+            'type' => 'website',
+            'canonical' => $canonical,
+            'schema' => [
+                '@context' => 'https://schema.org',
+                '@type' => 'WebSite',
+                'name' => 'Чемпион-Теннис',
+                'url' => 'https://champion-tennis.ru',
+                'description' => 'Спортивный портал тенниса России Чемпион-Теннис: новости тенниса и спорта, расписание турниров, рейтинги, аналитика, статьи.',
+                'potentialAction' => [
+                    '@type' => 'SearchAction',
+                    'target' => 'https://champion-tennis.ru/search?q={search_term_string}',
+                    'query-input' => 'required name=search_term_string'
+                ]
+            ]
         ];
     }
     if ($route === 'news') {
-        if ($subSubRoute) {
-            $st = $pdo->prepare("SELECT meta_title, meta_description, title, excerpt FROM news WHERE slug = ?");
-            $st->execute([$subSubRoute]);
+        $newsSlug = $subSubRoute ?: $subRoute;
+        if ($newsSlug && !in_array($newsSlug, ['atp', 'wta', 'grand-slam', 'team-russia', 'padel-pickleball'])) {
+            $st = $pdo->prepare("SELECT * FROM news WHERE slug = ?");
+            $st->execute([$newsSlug]);
             $n = $st->fetch();
-            if ($n) return ['title' => $n['meta_title'] ?: $n['title'] . ' — Чемпион-Теннис', 'desc' => $n['meta_description'] ?: $n['excerpt']];
-        } elseif ($subRoute) {
-            $st = $pdo->prepare("SELECT meta_title, meta_description, title, excerpt FROM news WHERE slug = ?");
-            $st->execute([$subRoute]);
-            $n = $st->fetch();
-            if ($n) return ['title' => $n['meta_title'] ?: $n['title'] . ' — Чемпион-Теннис', 'desc' => $n['meta_description'] ?: $n['excerpt']];
+            if ($n) {
+                $img = resolveImg($n['image']);
+                $newsCanonical = '/news/' . $n['category'] . '/' . $n['slug'];
+                return [
+                    'title' => $n['meta_title'] ?: ($n['title'] . ' — Чемпион-Теннис'),
+                    'desc' => $n['meta_description'] ?: $n['excerpt'],
+                    'image' => $img,
+                    'type' => 'article',
+                    'canonical' => $newsCanonical,
+                    'schema' => [
+                        '@context' => 'https://schema.org',
+                        '@type' => 'NewsArticle',
+                        'mainEntityOfPage' => ['@type' => 'WebPage', '@id' => 'https://champion-tennis.ru' . $newsCanonical],
+                        'headline' => $n['title'],
+                        'image' => ['https://champion-tennis.ru' . $img],
+                        'datePublished' => date('c', strtotime($n['published_at'])),
+                        'dateModified' => date('c', strtotime($n['published_at'])),
+                        'author' => ['@type' => 'Organization', 'name' => 'Редакция Чемпион-Теннис', 'url' => 'https://champion-tennis.ru/about'],
+                        'publisher' => [
+                            '@type' => 'Organization',
+                            'name' => 'Чемпион-Теннис',
+                            'logo' => ['@type' => 'ImageObject', 'url' => 'https://champion-tennis.ru/android-chrome-192x192.png']
+                        ],
+                        'description' => $n['excerpt']
+                    ]
+                ];
+            }
         }
-        return ['title' => 'Новости тенниса — Champion-Tennis.ru', 'desc' => 'Свежие новости российского и мирового тенниса: ATP, WTA, турниры Большого шлема, результаты матчей.'];
+        return [
+            'title' => 'Новости тенниса — Champion-Tennis.ru',
+            'desc' => 'Свежие новости российского и мирового тенниса: ATP, WTA, турниры Большого шлема, результаты матчей.',
+            'image' => '/images/hero-tennis-ball.jpg',
+            'type' => 'website',
+            'canonical' => $canonical,
+            'schema' => null
+        ];
     }
     if ($route === 'blog') {
         $slug = $subSubRoute ?: $subRoute;
         if ($slug && !in_array($slug, ['previews', 'tactics', 'gear', 'history', 'interviews', 'guides'])) {
-            $st = $pdo->prepare("SELECT meta_title, meta_description, title, excerpt FROM articles WHERE slug = ?");
+            $st = $pdo->prepare("SELECT * FROM articles WHERE slug = ?");
             $st->execute([$slug]);
             $a = $st->fetch();
-            if ($a) return ['title' => $a['meta_title'] ?: $a['title'] . ' — Блог «Чемпион-Теннис»', 'desc' => $a['meta_description'] ?: $a['excerpt']];
+            if ($a) {
+                $img = resolveImg($a['image']);
+                $blogCanonical = '/blog/' . $a['category'] . '/' . $a['slug'];
+                return [
+                    'title' => $a['meta_title'] ?: ($a['title'] . ' — Блог «Чемпион-Теннис»'),
+                    'desc' => $a['meta_description'] ?: $a['excerpt'],
+                    'image' => $img,
+                    'type' => 'article',
+                    'canonical' => $blogCanonical,
+                    'schema' => [
+                        '@context' => 'https://schema.org',
+                        '@type' => 'BlogPosting',
+                        'mainEntityOfPage' => ['@type' => 'WebPage', '@id' => 'https://champion-tennis.ru' . $blogCanonical],
+                        'headline' => $a['title'],
+                        'image' => ['https://champion-tennis.ru' . $img],
+                        'datePublished' => date('c', strtotime($a['published_at'])),
+                        'dateModified' => date('c', strtotime($a['published_at'])),
+                        'author' => ['@type' => 'Person', 'name' => $a['author_name'] ?: 'Михаил Соколов', 'jobTitle' => $a['author_role'] ?: 'Эксперт'],
+                        'publisher' => [
+                            '@type' => 'Organization',
+                            'name' => 'Чемпион-Теннис',
+                            'logo' => ['@type' => 'ImageObject', 'url' => 'https://champion-tennis.ru/android-chrome-192x192.png']
+                        ],
+                        'description' => $a['excerpt']
+                    ]
+                ];
+            }
         }
-        return ['title' => 'Аналитика и Блог о теннисе — Чемпион-Теннис', 'desc' => 'Экспертные статьи о теннисе, разбор техники, превью турниров, обзоры экипировки от мастеров спорта.'];
+        return [
+            'title' => 'Аналитика и Блог о теннисе — Чемпион-Теннис',
+            'desc' => 'Экспертные статьи о теннисе, разбор техники, превью турниров, обзоры экипировки от мастеров спорта.',
+            'image' => '/images/blog-tactics.jpg',
+            'type' => 'website',
+            'canonical' => $canonical,
+            'schema' => null
+        ];
     }
     if ($route === 'sitemap') {
-        return ['title' => 'Карта сайта — Все страницы и разделы Champion-Tennis.ru', 'desc' => 'Полный иерархический каталог всех разделов, новостей и аналитических статей портала Чемпион-Теннис.'];
+        return [
+            'title' => 'Карта сайта — Все страницы и разделы Champion-Tennis.ru',
+            'desc' => 'Полный иерархический каталог всех разделов, новостей и аналитических статей портала Чемпион-Теннис.',
+            'image' => '/images/hero-tennis-ball.jpg',
+            'type' => 'website',
+            'canonical' => '/sitemap',
+            'schema' => null
+        ];
     }
 
     $st = $pdo->prepare("SELECT meta_title, meta_description, title FROM pages WHERE slug = ?");
     $st->execute([$route]);
     $p = $st->fetch();
-    if ($p) return ['title' => $p['meta_title'] ?: $p['title'] . ' — Чемпион-Теннис', 'desc' => $p['meta_description'] ?: ''];
-    return ['title' => 'Чемпион-Теннис | Спортивный портал', 'desc' => 'Главный спортивный портал тенниса России.'];
+    if ($p) {
+        return [
+            'title' => $p['meta_title'] ?: ($p['title'] . ' — Чемпион-Теннис'),
+            'desc' => $p['meta_description'] ?: '',
+            'image' => '/images/hero-tennis-ball.jpg',
+            'type' => 'website',
+            'canonical' => '/' . $route,
+            'schema' => null
+        ];
+    }
+    return [
+        'title' => 'Чемпион-Теннис | Спортивный портал',
+        'desc' => 'Главный спортивный портал тенниса России.',
+        'image' => '/images/hero-tennis-ball.jpg',
+        'type' => 'website',
+        'canonical' => $canonical,
+        'schema' => null
+    ];
 }
 
 $pageMeta = getPageMeta($route, $subRoute, $subSubRoute, $pdo);
@@ -283,6 +526,59 @@ $pageMeta = getPageMeta($route, $subRoute, $subSubRoute, $pdo);
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title><?= htmlspecialchars($pageMeta['title']) ?></title>
   <meta name="description" content="<?= htmlspecialchars($pageMeta['desc']) ?>">
+
+  <!-- Канонический URL (Требование 8) -->
+  <link rel="canonical" href="https://champion-tennis.ru<?= htmlspecialchars($pageMeta['canonical'] ?? '/') ?>">
+
+  <!-- Фавиконы для всех платформ и браузеров (Требование 6) -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <meta name="theme-color" content="#0a5c36">
+
+  <!-- OpenGraph микроразметка (Требование 7) -->
+  <meta property="og:type" content="<?= htmlspecialchars($pageMeta['type'] ?? 'website') ?>">
+  <meta property="og:site_name" content="Чемпион-Теннис">
+  <meta property="og:title" content="<?= htmlspecialchars($pageMeta['title']) ?>">
+  <meta property="og:description" content="<?= htmlspecialchars($pageMeta['desc']) ?>">
+  <meta property="og:url" content="https://champion-tennis.ru<?= htmlspecialchars($pageMeta['canonical'] ?? '/') ?>">
+  <meta property="og:image" content="<?= htmlspecialchars(strpos($pageMeta['image'], 'http') === 0 ? $pageMeta['image'] : ('https://champion-tennis.ru' . $pageMeta['image'])) ?>">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="ru_RU">
+
+  <!-- Twitter Card микроразметка (Требование 7) -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="<?= htmlspecialchars($pageMeta['title']) ?>">
+  <meta name="twitter:description" content="<?= htmlspecialchars($pageMeta['desc']) ?>">
+  <meta name="twitter:image" content="<?= htmlspecialchars(strpos($pageMeta['image'], 'http') === 0 ? $pageMeta['image'] : ('https://champion-tennis.ru' . $pageMeta['image'])) ?>">
+
+  <!-- Микроразметка Schema.org JSON-LD (Требование 7) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Чемпион-Теннис",
+    "url": "https://champion-tennis.ru",
+    "logo": "https://champion-tennis.ru/images/hero-tennis-ball.jpg",
+    "sameAs": [
+      "https://t.me/champion_tennis_ru",
+      "https://vk.com/champion_tennis_ru"
+    ],
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "contactType": "customer service",
+      "url": "https://champion-tennis.ru/contacts"
+    }
+  }
+  </script>
+  <?php if (!empty($pageMeta['schema'])): ?>
+    <script type="application/ld+json">
+    <?= json_encode($pageMeta['schema'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) ?>
+    </script>
+  <?php endif; ?>
 
   <!-- CSS Стили сайта -->
   <link rel="stylesheet" href="/css/main.css">
@@ -386,16 +682,16 @@ $pageMeta = getPageMeta($route, $subRoute, $subSubRoute, $pdo);
       <a href="/about" class="nav-link <?= $route === 'about' ? 'active' : '' ?>">О проекте</a>
     </nav>
 
-    <!-- Header Actions (Пункт 4: работающий поиск; Пункт 5: убрана кнопка Админка; Пункт 17: гамбургер) -->
+    <!-- Header Actions: Кнопка поиска только значком лупы (Требование 3) + Гамбургер на мобильных (Требование 4) -->
     <div class="header-actions">
-      <button class="search-btn-trigger js-search-trigger" type="button" aria-label="Поиск по сайту">
-        <svg style="width:16px; height:16px; display:inline-block; vertical-align:-2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-        <span>Поиск по сайту</span>
+      <!-- Кнопка поиска по сайту: значок лупы без текста, тултип при наведении (Требование 3) -->
+      <button class="search-btn-trigger js-search-trigger" type="button" aria-label="Поиск по сайту" title="Поиск по сайту">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
       </button>
 
-      <!-- Мобильная кнопка меню Гамбургер (Пункт 17) -->
-      <button class="mobile-menu-toggle" id="mobileMenuToggle" type="button" aria-label="Открыть мобильное меню">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+      <!-- Мобильная кнопка меню Гамбургер: строго рядом с лупой на экранах <= 992px (Требование 4) -->
+      <button class="mobile-menu-toggle" id="mobileMenuToggle" type="button" aria-label="Открыть мобильное меню" title="Меню сайта">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
           <line x1="3" y1="6" x2="21" y2="6"></line>
           <line x1="3" y1="12" x2="21" y2="12"></line>
           <line x1="3" y1="18" x2="21" y2="18"></line>
@@ -565,6 +861,12 @@ $pageMeta = getPageMeta($route, $subRoute, $subSubRoute, $pdo);
               <p class="cta-subtitle">Сводка ночных матчей и расклады экспертов каждое утро на вашу почту.</p>
               <form class="cta-form js-newsletter-form">
                 <input type="email" class="cta-input" placeholder="Ваш e-mail" required>
+                <div class="form-agree-wrap" style="color:rgba(255,255,255,0.85); font-size:0.75rem; margin:8px 0 10px 0;">
+                  <input type="checkbox" name="agree" class="form-agree-checkbox" id="agree_home_newsletter" required style="accent-color:#ffffff; cursor:pointer;">
+                  <label for="agree_home_newsletter" style="color:rgba(255,255,255,0.85); cursor:pointer;">
+                    Нажимая кнопку, вы соглашаетесь с <a href="/privacy-policy" target="_blank" style="color:#ffffff; text-decoration:underline;">Политикой обработки данных</a>.
+                  </label>
+                </div>
                 <button type="submit" class="btn-cta-submit">Подписаться</button>
               </form>
             </div>
@@ -577,9 +879,46 @@ $pageMeta = getPageMeta($route, $subRoute, $subSubRoute, $pdo);
     // =========================================================================
     elseif ($route === 'search'):
         $q = trim($_GET['q'] ?? '');
+        $foundPages = [];
         $foundNews = [];
         $foundArticles = [];
+
         if (mb_strlen($q) >= 2) {
+            $qLower = mb_strtolower($q, 'UTF-8');
+            $allSections = [
+                ['title' => 'Новости тенниса', 'url' => '/news', 'keys' => ['новости', 'лента новостей', 'теннисные новости', 'новости спорта', 'news', 'лента'], 'desc' => 'Главные события российского и мирового тенниса, туры ATP и WTA'],
+                ['title' => 'ATP Тур (Мужчины)', 'url' => '/news/atp', 'keys' => ['atp', 'атп', 'мужской теннис', 'мужчины'], 'desc' => 'Новости и результаты матчей мужского тура ATP'],
+                ['title' => 'WTA Тур (Женщины)', 'url' => '/news/wta', 'keys' => ['wta', 'вта', 'женский теннис', 'женщины'], 'desc' => 'Новости и результаты матчей женского тура WTA'],
+                ['title' => 'Большой шлем (Grand Slam)', 'url' => '/news/grand-slam', 'keys' => ['шлем', 'большой шлем', 'grand slam', 'уимблдон', 'ролан гаррос', 'us open', 'australian open'], 'desc' => 'Турниры Большого шлема'],
+                ['title' => 'Сборная России и РТТ', 'url' => '/news/team-russia', 'keys' => ['россия', 'сборная', 'ртт', 'российский теннис', 'team russia', 'кубок кремля'], 'desc' => 'Сборная России и национальный тур РТТ'],
+                ['title' => 'Падел и Пиклбол', 'url' => '/news/padel-pickleball', 'keys' => ['падел', 'пиклбол', 'падл', 'padel', 'pickleball'], 'desc' => 'Развитие падела и пиклбола в России и мире'],
+                ['title' => 'Аналитика и Блог о теннисе', 'url' => '/blog', 'keys' => ['блог', 'аналитика', 'статьи', 'разборы', 'авторские материалы', 'мнения', 'blog', 'колонка', 'статья'], 'desc' => 'Авторские статьи экспертов, тактические разборы и исторические хроники'],
+                ['title' => 'Календарь теннисных турниров 2026', 'url' => '/tournaments', 'keys' => ['турниры', 'календарь', 'расписание', 'турнирная сетка', 'сетка', 'мастерс', 'tournaments', 'турнир'], 'desc' => 'Календарь турниров Большого шлема, Мастерс 1000 и соревнований в РФ'],
+                ['title' => 'Официальные рейтинги ATP и WTA', 'url' => '/rankings', 'keys' => ['рейтинг', 'рейтинги', 'топ', 'ранкинг', 'rankings', 'очки', 'первая ракетка', 'таблица'], 'desc' => 'Официальная таблица очков мирового рейтинга теннисистов и теннисисток'],
+                ['title' => 'Звезды тенниса и профили игроков', 'url' => '/players', 'keys' => ['игроки', 'теннисисты', 'теннисистки', 'профили', 'игрок', 'players', 'биографии'], 'desc' => 'Досье, статистика и достижения ведущих спортсменов'],
+                ['title' => 'Ракетки и Экипировка 2026', 'url' => '/gear', 'keys' => ['экипировка', 'ракетки', 'струны', 'кроссовки', 'мячи', 'gear', 'wilson', 'babolat', 'head', 'yonex', 'ракетка'], 'desc' => 'Гид по выбору профессиональных ракеток и обуви для корта'],
+                ['title' => 'Глоссарий теннисных терминов', 'url' => '/glossary', 'keys' => ['глоссарий', 'термины', 'словарь', 'тай-брейк', 'эйс', 'брейк', 'слайс', 'glossary'], 'desc' => 'Справочник профессиональной терминологии'],
+                ['title' => 'О проекте и Редакция', 'url' => '/about', 'keys' => ['о проекте', 'редакция', 'о нас', 'команда', 'журналисты', 'авторы', 'about'], 'desc' => 'Информация о портале Champion-Tennis.ru и составе редакции'],
+                ['title' => 'Контакты и Размещение Рекламы', 'url' => '/contacts', 'keys' => ['контакты', 'реклама', 'связь', 'сотрудничество', 'contacts'], 'desc' => 'Контакты дежурного редактора и коммерческого отдела'],
+                ['title' => 'Правила пользования сайтом', 'url' => '/site-rules', 'keys' => ['правила', 'правила сайта', 'правила пользования', 'site rules', 'модерация'], 'desc' => 'Регламент поведения на сайте и публикации'],
+                ['title' => 'Пользовательское соглашение', 'url' => '/user-agreement', 'keys' => ['соглашение', 'пользовательское соглашение', 'условия'], 'desc' => 'Официальное пользовательское соглашение'],
+                ['title' => 'Политика конфиденциальности (152-ФЗ)', 'url' => '/privacy-policy', 'keys' => ['политика', 'конфиденциальность', '152-фз', 'персональные данные', 'privacy policy'], 'desc' => 'Политика обработки персональных данных'],
+                ['title' => 'Карта сайта', 'url' => '/sitemap', 'keys' => ['карта сайта', 'навигация', 'sitemap', 'все разделы'], 'desc' => 'Полная иерархическая карта разделов']
+            ];
+
+            foreach ($allSections as $s) {
+                if (mb_stripos($s['title'], $q, 0, 'UTF-8') !== false || mb_stripos($s['desc'], $q, 0, 'UTF-8') !== false) {
+                    $foundPages[] = $s;
+                } else {
+                    foreach ($s['keys'] as $k) {
+                        if (mb_stripos($k, $qLower, 0, 'UTF-8') !== false || mb_stripos($qLower, $k, 0, 'UTF-8') !== false) {
+                            $foundPages[] = $s;
+                            break;
+                        }
+                    }
+                }
+            }
+
             $stN = $pdo->prepare("SELECT * FROM news WHERE title LIKE ? OR excerpt LIKE ? OR content LIKE ? ORDER BY published_at DESC LIMIT 20");
             $stN->execute(["%$q%", "%$q%", "%$q%"]);
             $foundNews = $stN->fetchAll();
@@ -592,11 +931,28 @@ $pageMeta = getPageMeta($route, $subRoute, $subSubRoute, $pdo);
         ?>
         <div class="article-container" style="max-width:960px;">
           <h1 class="article-title-main">Результаты поиска: «<?= htmlspecialchars($q) ?>»</h1>
-          <p style="color:#64748b; margin-bottom:24px;">Найдено материалов: <?= count($foundNews) + count($foundArticles) ?></p>
+          <p style="color:#64748b; margin-bottom:24px;">Найдено совпадений: <?= count($foundPages) + count($foundNews) + count($foundArticles) ?></p>
 
-          <?php if (empty($foundNews) && empty($foundArticles)): ?>
+          <?php if (empty($foundPages) && empty($foundNews) && empty($foundArticles)): ?>
             <p>По вашему запросу ничего не найдено. Попробуйте изменить формулировку (например: Медведев, Рим, ракетки, падел).</p>
           <?php else: ?>
+            <?php if (!empty($foundPages)): ?>
+              <h2 style="font-size:1.3rem; margin:24px 0 16px; color:#0f172a; display:flex; align-items:center; gap:8px;">
+                <span style="display:inline-block; width:6px; height:22px; background:#0a5c36; border-radius:3px;"></span>
+                Разделы и страницы сайта
+              </h2>
+              <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:12px; margin-bottom:28px;">
+                <?php foreach ($foundPages as $p): ?>
+                  <a href="<?= $p['url'] ?>" style="display:block; padding:16px 18px; background:white; border:1px solid #cbd5e1; border-radius:8px; text-decoration:none; transition:all 0.2s;" onmouseover="this.style.borderColor='#0a5c36'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.06)';" onmouseout="this.style.borderColor='#cbd5e1'; this.style.boxShadow='none';">
+                    <span style="font-size:0.7rem; font-weight:700; text-transform:uppercase; background:#dcfce7; color:#166534; padding:2px 7px; border-radius:4px;">Страница</span>
+                    <strong style="display:block; margin:6px 0 4px; color:#0f172a; font-size:1.05rem;"><?= htmlspecialchars($p['title']) ?></strong>
+                    <div style="font-size:0.8125rem; color:#64748b; line-height:1.4;"><?= htmlspecialchars($p['desc']) ?></div>
+                    <div style="margin-top:8px; font-size:0.8rem; font-weight:700; color:#0a5c36;">Перейти в раздел &rarr;</div>
+                  </a>
+                <?php endforeach; ?>
+              </div>
+            <?php endif; ?>
+
             <?php if (!empty($foundNews)): ?>
               <h2 style="font-size:1.3rem; margin:24px 0 16px; color:#0a5c36;">Новости</h2>
               <div style="display:flex; flex-direction:column; gap:16px;">
@@ -700,14 +1056,8 @@ $pageMeta = getPageMeta($route, $subRoute, $subSubRoute, $pdo);
                 <?= $article['content'] ?>
               </div>
 
-              <!-- Шаринг -->
-              <div class="article-sharing-bar" style="margin-top:36px; padding:16px; background:#f8fafc; border-radius:8px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-                <div style="font-weight:700; font-size:0.875rem;">Поделиться материалом:</div>
-                <div style="display:flex; gap:10px;">
-                  <a href="https://t.me/share/url?url=<?= urlencode('https://champion-tennis.ru/blog/' . $article['category'] . '/' . $article['slug']) ?>&text=<?= urlencode($article['title']) ?>" target="_blank" class="share-btn" style="padding:6px 14px; background:#0284c7; color:white; border-radius:6px; text-decoration:none; font-size:0.8125rem; font-weight:700;">✈️ Telegram</a>
-                  <a href="https://vk.com/share.php?url=<?= urlencode('https://champion-tennis.ru/blog/' . $article['category'] . '/' . $article['slug']) ?>" target="_blank" class="share-btn" style="padding:6px 14px; background:#4f46e5; color:white; border-radius:6px; text-decoration:none; font-size:0.8125rem; font-weight:700;">🔵 ВКонтакте</a>
-                </div>
-              </div>
+              <!-- Шаринг материала в соцсети и мессенджеры (Требование 9) -->
+              <?= renderShareBlock('https://champion-tennis.ru/blog/' . $article['category'] . '/' . $article['slug'], $article['title'], 'материалом') ?>
 
               <!-- Блок авторов (Пункт 11: 1-2 автора с фото, именем-фамилией и данными со страницы О проекте) -->
               <div class="article-authors-card" style="margin-top:40px; padding:24px; background:#f8fafc; border-radius:10px; border:1px solid #e2e8f0;">
@@ -868,14 +1218,8 @@ $pageMeta = getPageMeta($route, $subRoute, $subSubRoute, $pdo);
                 <?= $newsItem['content'] ?>
               </div>
 
-              <!-- Шаринг новости -->
-              <div class="article-sharing-bar" style="margin-top:36px; padding:16px; background:#f8fafc; border-radius:8px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-                <div style="font-weight:700; font-size:0.875rem;">Поделиться новостью:</div>
-                <div style="display:flex; gap:10px;">
-                  <a href="https://t.me/share/url?url=<?= urlencode('https://champion-tennis.ru/news/' . $newsItem['category'] . '/' . $newsItem['slug']) ?>&text=<?= urlencode($newsItem['title']) ?>" target="_blank" class="share-btn" style="padding:6px 14px; background:#0284c7; color:white; border-radius:6px; text-decoration:none; font-size:0.8125rem; font-weight:700;">✈️ Telegram</a>
-                  <a href="https://vk.com/share.php?url=<?= urlencode('https://champion-tennis.ru/news/' . $newsItem['category'] . '/' . $newsItem['slug']) ?>" target="_blank" class="share-btn" style="padding:6px 14px; background:#4f46e5; color:white; border-radius:6px; text-decoration:none; font-size:0.8125rem; font-weight:700;">🔵 ВКонтакте</a>
-                </div>
-              </div>
+              <!-- Шаринг новости в соцсети и мессенджеры (Требование 9) -->
+              <?= renderShareBlock('https://champion-tennis.ru/news/' . $newsItem['category'] . '/' . $newsItem['slug'], $newsItem['title'], 'новостью') ?>
 
               <!-- Блок «Еще новости» с 3 карточками (Пункт 3: надпись «Еще новости», формат ДД.ММ.ГГГГ ЧЧ:ММ, уникальные картинки) -->
               <div class="more-news-section" style="margin-top:40px; padding-top:28px; border-top:2px solid #e2e8f0;">
@@ -1201,15 +1545,18 @@ $pageMeta = getPageMeta($route, $subRoute, $subSubRoute, $pdo);
           <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:32px; margin-top:24px;">
             <div>
               <h2 style="font-size:1.25rem; font-weight:800; margin-bottom:16px;">Форма связи с редакцией</h2>
-              <form id="contactForm" style="display:flex; flex-direction:column; gap:14px;">
+              <form id="contactForm" class="js-contact-form" style="display:flex; flex-direction:column; gap:14px;">
                 <input type="text" name="name" class="cta-input" placeholder="Ваше имя / Компания" required style="border:1px solid #cbd5e1; background:white; color:#0f172a;">
                 <input type="text" name="contact" class="cta-input" placeholder="Ваш Email или телефон" required style="border:1px solid #cbd5e1; background:white; color:#0f172a;">
-                <input type="text" name="subject" class="cta-input" placeholder="Тема сообщения" required style="border:1px solid #cbd5e1; background:white; color:#0f172a;">
+                <input type="text" name="subject" class="cta-input" placeholder="Тема сообщения (публикация, реклама, исправление)" required style="border:1px solid #cbd5e1; background:white; color:#0f172a;">
                 <textarea name="message" class="cta-input" rows="5" placeholder="Опишите подробно суть предложения или вопроса..." required style="border:1px solid #cbd5e1; background:white; color:#0f172a;"></textarea>
-                <button type="submit" class="btn-cta-submit" style="border:none; padding:12px; font-weight:700;">Отправить обращение в редакцию &rarr;</button>
-                <div style="font-size:0.75rem; color:#94a3b8; text-align:center;">
-                  Нажимая кнопку, вы соглашаетесь с <a href="/privacy-policy" style="text-decoration:underline;">Политикой обработки данных</a>.
+                <div class="form-agree-wrap">
+                  <input type="checkbox" name="agree" class="form-agree-checkbox" id="agree_contacts" required>
+                  <label for="agree_contacts">
+                    Нажимая кнопку, вы соглашаетесь с <a href="/privacy-policy" target="_blank">Политикой обработки данных</a>.
+                  </label>
                 </div>
+                <button type="submit" class="btn-cta-submit" style="border:none; padding:12px; font-weight:700;">Отправить обращение в редакцию &rarr;</button>
               </form>
             </div>
             <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:24px;">
@@ -1260,13 +1607,19 @@ $pageMeta = getPageMeta($route, $subRoute, $subSubRoute, $pdo);
                   <p style="font-size:0.875rem; color:#64748b; margin:0 0 20px 0;">
                     Если у вас есть вопросы по данному разделу, предложения по улучшению портала или материалы для публикации — напишите дежурному редактору:
                   </p>
-                  <form id="contactForm" style="display:flex; flex-direction:column; gap:14px;">
+                  <form id="contactForm" class="js-contact-form" style="display:flex; flex-direction:column; gap:14px;">
                     <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:14px;">
                       <input type="text" name="name" class="cta-input" placeholder="Ваше имя" required style="border:1px solid #cbd5e1; background:white; color:#0f172a;">
                       <input type="text" name="contact" class="cta-input" placeholder="Email или телефон для ответа" required style="border:1px solid #cbd5e1; background:white; color:#0f172a;">
                     </div>
                     <input type="text" name="subject" class="cta-input" value="Вопрос по разделу «<?= htmlspecialchars($page['title']) ?>»" required style="border:1px solid #cbd5e1; background:white; color:#0f172a;">
                     <textarea name="message" class="cta-input" rows="4" placeholder="Текст вашего сообщения в редакцию..." required style="border:1px solid #cbd5e1; background:white; color:#0f172a;"></textarea>
+                    <div class="form-agree-wrap">
+                      <input type="checkbox" name="agree" class="form-agree-checkbox" id="agree_feedback_<?= htmlspecialchars($slug) ?>" required>
+                      <label for="agree_feedback_<?= htmlspecialchars($slug) ?>">
+                        Нажимая кнопку, вы соглашаетесь с <a href="/privacy-policy" target="_blank">Политикой обработки данных</a>.
+                      </label>
+                    </div>
                     <button type="submit" class="btn-cta-submit" style="border:none; padding:12px; font-weight:700;">Отправить сообщение в редакцию &rarr;</button>
                     <div style="font-size:0.75rem; color:#94a3b8; text-align:center;">
                       Обращение будет передано дежурному редактору Champion-Tennis.ru.
@@ -1294,10 +1647,20 @@ $pageMeta = getPageMeta($route, $subRoute, $subSubRoute, $pdo);
         <p class="footer-about-text" style="color:#cbd5e1; font-size:0.9rem; line-height:1.55; margin-top:8px;">
           <?= htmlspecialchars($footer['about_text'] ?? 'лучшее из мира спорта и тенниса') ?>
         </p>
-        <div style="display:flex; gap:12px; margin-top:14px;">
-          <a href="https://t.me/champion_tennis_ru" target="_blank" class="top-social-link" style="color:white; text-decoration:none; font-weight:700; background:#0f172a; padding:4px 8px; border-radius:4px;">Telegram</a>
-          <a href="https://vk.com/champion_tennis_ru" target="_blank" class="top-social-link" style="color:white; text-decoration:none; font-weight:700; background:#0f172a; padding:4px 8px; border-radius:4px;">ВКонтакте</a>
-          <a href="/rss.xml" class="top-social-link" style="color:white; text-decoration:none; font-weight:700; background:#0f172a; padding:4px 8px; border-radius:4px;">RSS</a>
+        <!-- Социальные сети и RSS столбиком (Требование 2) -->
+        <div class="footer-social-column">
+          <a href="https://t.me/champion_tennis_ru" target="_blank" rel="noopener" class="footer-social-row-link" title="Telegram-канал">
+            <svg style="width:16px; height:16px; fill:#38bdf8; flex-shrink:0;" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.19-.08-.05-.19-.02-.27 0-.12.03-1.99 1.27-5.62 3.72-.53.36-1.01.54-1.44.53-.47-.01-1.38-.27-2.06-.49-.83-.27-1.49-.42-1.43-.88.03-.24.37-.49 1.02-.75 3.99-1.74 6.66-2.89 8.01-3.46 3.81-1.61 4.6-.19 4.6 1.48z"/></svg>
+            <span>Telegram канал</span>
+          </a>
+          <a href="https://vk.com/champion_tennis_ru" target="_blank" rel="noopener" class="footer-social-row-link" title="ВКонтакте">
+            <svg style="width:16px; height:16px; fill:#60a5fa; flex-shrink:0;" viewBox="0 0 24 24"><path d="M15.684 0H8.316C3.724 0 0 3.724 0 8.316v7.368C0 20.276 3.724 24 8.316 24h7.368C20.276 24 24 20.276 24 15.684V8.316C24 3.724 20.276 0 15.684 0zm3.602 17.533h-2.144c-.812 0-1.06-.645-2.52-2.115-1.274-1.242-1.84-1.398-2.155-1.398-.439 0-.566.126-.566.732v1.94c0 .524-.168.841-1.554.841-2.29 0-4.836-1.391-6.626-3.98-2.692-3.79-3.44-6.643-3.44-7.234 0-.324.126-.624.743-.624h2.145c.556 0 .768.253.98.849 1.082 3.125 2.89 5.86 3.633 5.86.282 0 .408-.126.408-.82v-3.21c-.085-1.472-.862-1.597-.862-2.122 0-.248.204-.498.535-.498h3.364c.467 0 .637.247.637.806v4.331c0 .466.204.623.34.623.28 0 .515-.157 1.047-.69 1.625-1.821 2.784-4.526 2.784-4.526.155-.323.411-.544.966-.544h2.144c.648 0 .788.334.648.806-.264 1.205-2.83 4.802-2.955 5.011-.274.425-.38.618 0 1.125.267.364 1.157 1.135 1.748 1.821 1.096 1.258 1.939 2.316 2.164 3.044.238.745-.119 1.133-.872 1.133z"/></svg>
+            <span>ВКонтакте</span>
+          </a>
+          <a href="/rss.xml" class="footer-social-row-link" title="RSS новостная лента">
+            <svg style="width:16px; height:16px; stroke:#fb923c; fill:none; flex-shrink:0;" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 5c7.18 0 13 5.82 13 13M6 11a7 7 0 017 7m-6 0a1 1 0 11-2 0 1 1 0 012 0z"></path></svg>
+            <span>RSS новостная лента</span>
+          </a>
         </div>
       </div>
 

@@ -268,32 +268,79 @@ button, input, select, textarea {
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .search-btn-trigger {
-  display: flex;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  padding: 0;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  background: var(--bg-main);
-  border: 1px solid var(--border);
-  padding: 8px 14px;
-  border-radius: var(--radius-full);
-  color: var(--text-muted);
-  font-size: 0.875rem;
+  justify-content: center;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  color: #0f172a;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
+  position: relative;
 }
 
 .search-btn-trigger:hover {
-  border-color: var(--primary);
-  color: var(--primary);
-  background: #ffffff;
+  background: #e2e8f0;
+  border-color: #0a5c36;
+  color: #0a5c36;
 }
 
 .search-btn-trigger svg {
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
+/* Мобильная кнопка Гамбургер — строго рядом с лупой на мобильных устройствах */
+.mobile-menu-toggle {
+  display: none;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  padding: 0;
+  align-items: center;
+  justify-content: center;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  color: #0f172a;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mobile-menu-toggle:hover {
+  background: #e2e8f0;
+  border-color: #0a5c36;
+}
+
+.mobile-menu-toggle svg {
+  width: 22px;
+  height: 22px;
+  display: block;
+}
+
+@media (max-width: 992px) {
+  .header-nav {
+    display: none !important;
+  }
+  .mobile-menu-toggle {
+    display: inline-flex !important;
+  }
+}
+
+@media (min-width: 993px) {
+  .mobile-menu-toggle {
+    display: none !important;
+  }
 }
 
 .admin-header-btn {
@@ -1359,8 +1406,10 @@ button, input, select, textarea {
 
 .article-sharing-bar {
   margin-top: 36px;
-  padding-top: 20px;
-  border-top: 1px solid var(--border);
+  padding: 18px 20px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1368,8 +1417,18 @@ button, input, select, textarea {
   gap: 14px;
 }
 
+.sharing-label {
+  font-weight: 700;
+  font-size: 0.9375rem;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .social-share-buttons {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
 }
 
@@ -1378,20 +1437,60 @@ button, input, select, textarea {
   align-items: center;
   gap: 6px;
   padding: 6px 14px;
-  border-radius: var(--radius-full);
+  border-radius: 6px;
   font-size: 0.8125rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  border: 1px solid var(--border);
-  background: #f8fafc;
-  color: var(--text-main);
-  transition: all 0.2s;
+  border: 1px solid transparent;
+  color: #ffffff !important;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
 .share-btn:hover {
-  background: var(--primary);
-  color: white;
-  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+  filter: brightness(1.08);
+}
+
+.share-btn-tg { background: #0284c7; }
+.share-btn-vk { background: #2787f5; }
+.share-btn-ok { background: #ee8208; }
+.share-btn-mm { background: #168de2; }
+.share-btn-max { background: #6366f1; }
+.share-btn-copy { background: #475569; }
+
+/* Блок согласия с политикой обработки данных для всех форм */
+.form-agree-wrap {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 6px 0 12px 0;
+  font-size: 0.8125rem;
+  color: #475569;
+  text-align: left;
+}
+
+.form-agree-wrap input[type="checkbox"] {
+  width: 17px;
+  height: 17px;
+  margin-top: 2px;
+  cursor: pointer;
+  flex-shrink: 0;
+  accent-color: var(--primary);
+}
+
+.form-agree-wrap label {
+  cursor: pointer;
+  line-height: 1.4;
+  user-select: none;
+}
+
+.form-agree-wrap a {
+  color: var(--primary);
+  text-decoration: underline;
+  font-weight: 600;
 }
 
 /* ==========================================================================
@@ -1405,6 +1504,36 @@ button, input, select, textarea {
   margin-top: auto;
   border-top: 4px solid var(--primary);
   font-size: 0.875rem;
+}
+
+.footer-social-column {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.footer-social-row-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #cbd5e1 !important;
+  font-size: 0.84rem;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 7px 12px;
+  background: #1e293b;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  width: fit-content;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.footer-social-row-link:hover {
+  background: var(--primary);
+  color: #ffffff !important;
+  transform: translateX(4px);
+  border-color: var(--primary);
 }
 
 .footer-top-grid {

@@ -55,16 +55,16 @@
       <a href="/about" class="nav-link <%= typeof activeNav !== 'undefined' && activeNav === 'about' ? 'active' : '' %>">О проекте</a>
     </nav>
 
-    <!-- Header Actions (Пункт 5: удалена кнопка Админка; Пункт 4: работающий поиск; Пункт 17: гамбургер) -->
+    <!-- Header Actions: Кнопка поиска только значком лупы (Требование 3) + Гамбургер на мобильных (Требование 4) -->
     <div class="header-actions">
-      <button class="search-btn-trigger js-search-trigger" type="button" aria-label="Сквозной поиск по сайту">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-        <span>Поиск по сайту</span>
+      <!-- Кнопка поиска по сайту: значок лупы без текста, тултип при наведении (Требование 3) -->
+      <button class="search-btn-trigger js-search-trigger" type="button" aria-label="Поиск по сайту" title="Поиск по сайту">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
       </button>
 
-      <!-- Mobile Hamburger Button (Пункт 17) -->
-      <button class="mobile-menu-toggle" id="mobileMenuToggle" type="button" aria-label="Открыть мобильное меню">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+      <!-- Mobile Hamburger Button: строго рядом с лупой на экранах <= 992px (Требование 4) -->
+      <button class="mobile-menu-toggle" id="mobileMenuToggle" type="button" aria-label="Открыть мобильное меню" title="Меню сайта">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
           <line x1="3" y1="6" x2="21" y2="6"></line>
           <line x1="3" y1="12" x2="21" y2="12"></line>
           <line x1="3" y1="18" x2="21" y2="18"></line>

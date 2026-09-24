@@ -2,23 +2,69 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title><%= typeof title !== 'undefined' ? title : 'Чемпион-Теннис | Новости, Рейтинги и Аналитика' %></title>
   
   <meta name="description" content="<%= typeof meta_description !== 'undefined' && meta_description ? meta_description : 'Портал «Чемпион-Теннис» (champion-tennis.ru) — оперативные новости спорта и тенниса, результаты матчей, рейтинги ATP и WTA, турнирный календарь, блог и обзоры экипировки.' %>">
   <meta name="keywords" content="<%= typeof meta_keywords !== 'undefined' && meta_keywords ? meta_keywords : 'теннис, новости тенниса, рейтинг atp, рейтинг wta, медведев, рублев, андреева, турниры большого шлема, падел, экипировка' %>">
   
-  <!-- Open Graph / SEO -->
-  <meta property="og:type" content="website">
+  <!-- Канонический URL (Требование 8) -->
+  <link rel="canonical" href="https://champion-tennis.ru<%= typeof currentPath !== 'undefined' ? currentPath : '' %>">
+
+  <!-- Фавиконы для всех браузеров и устройств (Требование 6) -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <meta name="theme-color" content="#0a5c36">
+  
+  <!-- Open Graph микроразметка (Требование 7) -->
+  <meta property="og:type" content="<%= typeof og_type !== 'undefined' ? og_type : 'website' %>">
   <meta property="og:title" content="<%= typeof title !== 'undefined' ? title : 'Чемпион-Теннис' %>">
   <meta property="og:description" content="<%= typeof meta_description !== 'undefined' && meta_description ? meta_description : 'Главный российский теннисный медиа-портал' %>">
   <meta property="og:url" content="https://champion-tennis.ru<%= typeof currentPath !== 'undefined' ? currentPath : '' %>">
   <meta property="og:site_name" content="Чемпион-Теннис">
   <meta property="og:image" content="<%= typeof og_image !== 'undefined' && og_image ? og_image : 'https://champion-tennis.ru/images/hero-tennis-ball.jpg' %>">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="ru_RU">
+
+  <!-- Twitter Card микроразметка (Требование 7) -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="<%= typeof title !== 'undefined' ? title : 'Чемпион-Теннис' %>">
+  <meta name="twitter:description" content="<%= typeof meta_description !== 'undefined' && meta_description ? meta_description : 'Главный российский теннисный медиа-портал' %>">
+  <meta name="twitter:image" content="<%= typeof og_image !== 'undefined' && og_image ? og_image : 'https://champion-tennis.ru/images/hero-tennis-ball.jpg' %>">
   
-  <!-- Canonical URL -->
-  <link rel="canonical" href="https://champion-tennis.ru<%= typeof currentPath !== 'undefined' ? currentPath : '' %>">
-  
+  <!-- Schema.org JSON-LD Structured Data (Требование 7) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Чемпион-Теннис",
+    "url": "https://champion-tennis.ru",
+    "description": "Спортивный медиа-портал тенниса России: оперативные новости ATP и WTA, рейтинги, календарь турниров, статьи и экипировка.",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://champion-tennis.ru/search?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Чемпион-Теннис",
+    "url": "https://champion-tennis.ru",
+    "logo": "https://champion-tennis.ru/images/hero-tennis-ball.jpg",
+    "sameAs": [
+      "https://t.me/champion_tennis_ru",
+      "https://vk.com/champion_tennis_ru"
+    ]
+  }
+  </script>
+
   <!-- RSS Feed link -->
   <link rel="alternate" type="application/rss+xml" title="Чемпион-Теннис RSS" href="/rss.xml">
   <link rel="alternate" type="application/rss+xml" title="Чемпион-Теннис Срочные Новости RSS" href="/news-rss.xml">

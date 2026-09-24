@@ -53,19 +53,19 @@
         <%- article.content %>
       </div>
 
-      <!-- Sharing Bar -->
+      <!-- Sharing Bar (Требование 9) -->
       <div class="article-sharing-bar">
-        <div style="font-weight: 700; font-size: 0.875rem; color: #334155;">Поделиться статьей:</div>
+        <div class="sharing-label">
+          <svg style="width:18px; height:18px; stroke:#0a5c36; fill:none; display:inline-block; vertical-align:-3px; margin-right:4px;" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+          <span>Поделиться статьей:</span>
+        </div>
         <div class="social-share-buttons">
-          <a href="https://t.me/share/url?url=<%= encodeURIComponent('https://champion-tennis.ru/blog/' + article.category + '/' + article.slug) %>&text=<%= encodeURIComponent(article.title) %>" target="_blank" rel="noopener" class="share-btn">
-            <span>✈️ Telegram</span>
-          </a>
-          <a href="https://vk.com/share.php?url=<%= encodeURIComponent('https://champion-tennis.ru/blog/' + article.category + '/' + article.slug) %>" target="_blank" rel="noopener" class="share-btn">
-            <span>🔵 ВКонтакте</span>
-          </a>
-          <button type="button" class="share-btn js-copy-link">
-            <span>🔗 Скопировать ссылку</span>
-          </button>
+          <a href="https://t.me/share/url?url=<%= encodeURIComponent('https://champion-tennis.ru/blog/' + article.category + '/' + article.slug) %>&text=<%= encodeURIComponent(article.title) %>" target="_blank" rel="noopener" class="share-btn share-btn-tg" title="Поделиться в Telegram">✈️ Telegram</a>
+          <a href="https://vk.com/share.php?url=<%= encodeURIComponent('https://champion-tennis.ru/blog/' + article.category + '/' + article.slug) %>&title=<%= encodeURIComponent(article.title) %>" target="_blank" rel="noopener" class="share-btn share-btn-vk" title="Поделиться во ВКонтакте">🔵 ВКонтакте</a>
+          <a href="https://connect.ok.ru/offer?url=<%= encodeURIComponent('https://champion-tennis.ru/blog/' + article.category + '/' + article.slug) %>&title=<%= encodeURIComponent(article.title) %>" target="_blank" rel="noopener" class="share-btn share-btn-ok" title="Поделиться в Одноклассниках">🟠 Одноклассники</a>
+          <a href="https://connect.mail.ru/share?url=<%= encodeURIComponent('https://champion-tennis.ru/blog/' + article.category + '/' + article.slug) %>&title=<%= encodeURIComponent(article.title) %>" target="_blank" rel="noopener" class="share-btn share-btn-mm" title="Поделиться в Мой Мир">🔴 Мой Мир</a>
+          <button type="button" class="share-btn share-btn-max" onclick="shareToMax('https://champion-tennis.ru/blog/<%= article.category %>/<%= article.slug %>', '<%= article.title.replace(/'/g, "\\'") %>')" title="Поделиться в MAX мессенджер">💬 MAX</button>
+          <button type="button" class="share-btn share-btn-copy js-copy-link" onclick="copyPageUrl(this, 'https://champion-tennis.ru/blog/<%= article.category %>/<%= article.slug %>')" title="Скопировать ссылку в буфер обмена">🔗 Скопировать ссылку</button>
         </div>
       </div>
 

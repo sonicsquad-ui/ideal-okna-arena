@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a5c36" />
+      <stop offset="100%" stop-color="#052e16" />
+    </linearGradient>
+    <linearGradient id="ballGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#d9f99d" />
+      <stop offset="100%" stop-color="#84cc16" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.35" />
+    </filter>
+  </defs>
+
+  <!-- Background rounded squircle -->
+  <rect width="512" height="512" rx="110" fill="url(#bgGrad)" />
+
+  <!-- Outer gold court accent line -->
+  <rect x="24" y="24" width="464" height="464" rx="90" fill="none" stroke="#eab308" stroke-width="8" stroke-opacity="0.6" />
+
+  <!-- Tennis Ball Graphic -->
+  <g transform="translate(256,256) scale(1.15) translate(-128,-128)" filter="url(#shadow)">
+    <!-- Main Ball Circle -->
+    <circle cx="128" cy="128" r="100" fill="url(#ballGrad)" stroke="#4d7c0f" stroke-width="4" />
+    <!-- Ball Seam Curves -->
+    <path d="M 58,58 A 99,99 0 0,1 58,198" fill="none" stroke="#ffffff" stroke-width="12" stroke-linecap="round" />
+    <path d="M 198,58 A 99,99 0 0,0 198,198" fill="none" stroke="#ffffff" stroke-width="12" stroke-linecap="round" />
+  </g>
+</svg>

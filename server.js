@@ -645,10 +645,55 @@ app.get('/api/search', (req, res) => {
     return res.json({ results: [], total: 0 });
   }
 
-  const queryLike = `%${q}%`;
+  const qLower = q.toLowerCase();
   const results = [];
 
-  // 1. Search News
+  // 1. Полнотекстовый поиск по всем ключевым разделам и страницам сайта (Требование 3)
+  const systemPages = [
+    { title: 'Новости тенниса', type_label: 'Раздел', url: '/news', keys: ['новости', 'лента новостей', 'теннисные новости', 'новости спорта', 'news', 'лента'], desc: 'Главные события российского и мирового тенниса, туры ATP и WTA' },
+    { title: 'ATP Тур (Мужчины)', type_label: 'Раздел', url: '/news/atp', keys: ['atp', 'атп', 'мужской теннис', 'мужчины'], desc: 'Новости и результаты матчей мужского тура ATP' },
+    { title: 'WTA Тур (Женщины)', type_label: 'Раздел', url: '/news/wta', keys: ['wta', 'вта', 'женский теннис', 'женщины'], desc: 'Новости и результаты матчей женского тура WTA' },
+    { title: 'Большой шлем (Grand Slam)', type_label: 'Раздел', url: '/news/grand-slam', keys: ['шлем', 'большой шлем', 'grand slam', 'уимблдон', 'ролан гаррос', 'us open', 'australian open', 'мэйджор'], desc: 'Турниры Большого шлема' },
+    { title: 'Сборная России и РТТ', type_label: 'Раздел', url: '/news/team-russia', keys: ['россия', 'сборная', 'ртт', 'российский теннис', 'team russia', 'кубок кремля'], desc: 'Сборная России и национальный тур РТТ' },
+    { title: 'Падел и Пиклбол', type_label: 'Раздел', url: '/news/padel-pickleball', keys: ['падел', 'пиклбол', 'падл', 'padel', 'pickleball'], desc: 'Развитие падела и пиклбола в России и мире' },
+    { title: 'Аналитика и Блог о теннисе', type_label: 'Раздел', url: '/blog', keys: ['блог', 'аналитика', 'статьи', 'разборы', 'авторские материалы', 'мнения', 'blog', 'колонка', 'статья'], desc: 'Авторские статьи экспертов, тактические разборы и исторические хроники' },
+    { title: 'Календарь теннисных турниров 2026', type_label: 'Раздел', url: '/tournaments', keys: ['турниры', 'календарь', 'расписание', 'турнирная сетка', 'сетка', 'мастерс', 'tournaments', 'турнир'], desc: 'Календарь турниров Большого шлема, Мастерс 1000 и соревнований в РФ' },
+    { title: 'Официальные рейтинги ATP и WTA', type_label: 'Раздел', url: '/rankings', keys: ['рейтинг', 'рейтинги', 'топ', 'ранкинг', 'rankings', 'очки', 'первая ракетка', 'таблица'], desc: 'Официальная таблица очков мирового рейтинга теннисистов и теннисисток' },
+    { title: 'Звезды тенниса и профили игроков', type_label: 'Раздел', url: '/players', keys: ['игроки', 'теннисисты', 'теннисистки', 'профили', 'игрок', 'players', 'биографии'], desc: 'Досье, статистика и достижения ведущих российских и мировых спортсменов' },
+    { title: 'Ракетки и Экипировка 2026', type_label: 'Раздел', url: '/gear', keys: ['экипировка', 'ракетки', 'струны', 'кроссовки', 'мячи', 'gear', 'обзоры ракеток', 'wilson', 'babolat', 'head', 'yonex', 'ракетка'], desc: 'Гид по выбору профессиональных ракеток, струн и обуви для корта' },
+    { title: 'Глоссарий теннисных терминов', type_label: 'Справочник', url: '/glossary', keys: ['глоссарий', 'термины', 'словарь', 'тай-брейк', 'эйс', 'брейк', 'слайс', 'glossary', 'термин'], desc: 'Справочник профессиональной терминологии и правил судейства' },
+    { title: 'О проекте и Редакция', type_label: 'Страница', url: '/about', keys: ['о проекте', 'редакция', 'о нас', 'команда', 'журналисты', 'авторы', 'миссия', 'about', 'проект'], desc: 'Информация о спортивном портале Champion-Tennis.ru и составе редакции' },
+    { title: 'Контакты и Размещение Рекламы', type_label: 'Страница', url: '/contacts', keys: ['контакты', 'реклама', 'связь', 'размещение рекламы', 'сотрудничество', 'contacts', 'контакт'], desc: 'Контакты дежурного редактора и коммерческого отдела' },
+    { title: 'Правила пользования сайтом', type_label: 'Документ', url: '/site-rules', keys: ['правила', 'правила сайта', 'правила пользования', 'site rules', 'модерация', 'комментарии', 'правило'], desc: 'Регламент поведения на сайте, цитирования и публикации материалов' },
+    { title: 'Пользовательское соглашение', type_label: 'Документ', url: '/user-agreement', keys: ['соглашение', 'пользовательское соглашение', 'условия', 'user agreement'], desc: 'Официальное пользовательское соглашение портала' },
+    { title: 'Политика конфиденциальности (152-ФЗ)', type_label: 'Документ', url: '/privacy-policy', keys: ['политика', 'конфиденциальность', '152-фз', 'персональные данные', 'обработка данных', 'privacy policy'], desc: 'Политика обработки и защиты персональных данных пользователей' },
+    { title: 'Карта сайта', type_label: 'Страница', url: '/sitemap', keys: ['карта сайта', 'навигация', 'sitemap', 'все разделы', 'карта'], desc: 'Полная иерархическая карта разделов и материалов портала' }
+  ];
+
+  for (const sp of systemPages) {
+    let matched = false;
+    if (sp.title.toLowerCase().includes(qLower) || sp.desc.toLowerCase().includes(qLower)) {
+      matched = true;
+    } else {
+      for (const k of sp.keys) {
+        if (k.includes(qLower) || qLower.includes(k)) {
+          matched = true;
+          break;
+        }
+      }
+    }
+    if (matched) {
+      results.push({
+        title: sp.title,
+        type_label: sp.type_label,
+        url: sp.url,
+        desc: sp.desc,
+        date: 'Раздел'
+      });
+    }
+  }
+
+  // 2. Search News
   const newsMatches = db.prepare(`
     SELECT title, category, slug, published_at 
     FROM news 
@@ -665,7 +710,7 @@ app.get('/api/search', (req, res) => {
     });
   }
 
-  // 2. Search Blog Articles
+  // 3. Search Blog Articles
   const blogMatches = db.prepare(`
     SELECT title, category, slug, published_at 
     FROM articles 
@@ -676,13 +721,13 @@ app.get('/api/search', (req, res) => {
   for (const a of blogMatches) {
     results.push({
       title: a.title,
-      type_label: 'Статья',
+      type_label: 'Блог',
       url: `/blog/${a.category}/${a.slug}`,
       date: formatDateRu(a.published_at)
     });
   }
 
-  // 3. Search Players
+  // 4. Search Players
   const playerMatches = db.prepare(`
     SELECT name, name_en, slug 
     FROM players 
@@ -705,10 +750,55 @@ app.get('/api/search', (req, res) => {
 // Search Page
 app.get('/search', (req, res) => {
   const q = (req.query.q || '').trim();
+  const qLower = q.toLowerCase();
   const queryLike = `%${q}%`;
   const results = [];
 
   if (q.length >= 2) {
+    const systemPages = [
+      { title: 'Новости тенниса', type_label: 'Раздел', url: '/news', keys: ['новости', 'лента новостей', 'теннисные новости', 'новости спорта', 'news', 'лента'], desc: 'Главные события российского и мирового тенниса, туры ATP и WTA' },
+      { title: 'ATP Тур (Мужчины)', type_label: 'Раздел', url: '/news/atp', keys: ['atp', 'атп', 'мужской теннис', 'мужчины'], desc: 'Новости и результаты матчей мужского тура ATP' },
+      { title: 'WTA Тур (Женщины)', type_label: 'Раздел', url: '/news/wta', keys: ['wta', 'вта', 'женский теннис', 'женщины'], desc: 'Новости и результаты матчей женского тура WTA' },
+      { title: 'Большой шлем (Grand Slam)', type_label: 'Раздел', url: '/news/grand-slam', keys: ['шлем', 'большой шлем', 'grand slam', 'уимблдон', 'ролан гаррос', 'us open', 'australian open', 'мэйджор'], desc: 'Турниры Большого шлема' },
+      { title: 'Сборная России и РТТ', type_label: 'Раздел', url: '/news/team-russia', keys: ['россия', 'сборная', 'ртт', 'российский теннис', 'team russia', 'кубок кремля'], desc: 'Сборная России и национальный тур РТТ' },
+      { title: 'Падел и Пиклбол', type_label: 'Раздел', url: '/news/padel-pickleball', keys: ['падел', 'пиклбол', 'падл', 'padel', 'pickleball'], desc: 'Развитие падела и пиклбола в России и мире' },
+      { title: 'Аналитика и Блог о теннисе', type_label: 'Раздел', url: '/blog', keys: ['блог', 'аналитика', 'статьи', 'разборы', 'авторские материалы', 'мнения', 'blog', 'колонка', 'статья'], desc: 'Авторские статьи экспертов, тактические разборы и исторические хроники' },
+      { title: 'Календарь теннисных турниров 2026', type_label: 'Раздел', url: '/tournaments', keys: ['турниры', 'календарь', 'расписание', 'турнирная сетка', 'сетка', 'мастерс', 'tournaments', 'турнир'], desc: 'Календарь турниров Большого шлема, Мастерс 1000 и соревнований в РФ' },
+      { title: 'Официальные рейтинги ATP и WTA', type_label: 'Раздел', url: '/rankings', keys: ['рейтинг', 'рейтинги', 'топ', 'ранкинг', 'rankings', 'очки', 'первая ракетка', 'таблица'], desc: 'Официальная таблица очков мирового рейтинга теннисистов и теннисисток' },
+      { title: 'Звезды тенниса и профили игроков', type_label: 'Раздел', url: '/players', keys: ['игроки', 'теннисисты', 'теннисистки', 'профили', 'игрок', 'players', 'биографии'], desc: 'Досье, статистика и достижения ведущих российских и мировых спортсменов' },
+      { title: 'Ракетки и Экипировка 2026', type_label: 'Раздел', url: '/gear', keys: ['экипировка', 'ракетки', 'струны', 'кроссовки', 'мячи', 'gear', 'обзоры ракеток', 'wilson', 'babolat', 'head', 'yonex', 'ракетка'], desc: 'Гид по выбору профессиональных ракеток, струн и обуви для корта' },
+      { title: 'Глоссарий теннисных терминов', type_label: 'Справочник', url: '/glossary', keys: ['глоссарий', 'термины', 'словарь', 'тай-брейк', 'эйс', 'брейк', 'слайс', 'glossary', 'термин'], desc: 'Справочник профессиональной терминологии и правил судейства' },
+      { title: 'О проекте и Редакция', type_label: 'Страница', url: '/about', keys: ['о проекте', 'редакция', 'о нас', 'команда', 'журналисты', 'авторы', 'миссия', 'about', 'проект'], desc: 'Информация о спортивном портале Champion-Tennis.ru и составе редакции' },
+      { title: 'Контакты и Размещение Рекламы', type_label: 'Страница', url: '/contacts', keys: ['контакты', 'реклама', 'связь', 'размещение рекламы', 'сотрудничество', 'contacts', 'контакт'], desc: 'Контакты дежурного редактора и коммерческого отдела' },
+      { title: 'Правила пользования сайтом', type_label: 'Документ', url: '/site-rules', keys: ['правила', 'правила сайта', 'правила пользования', 'site rules', 'модерация', 'комментарии', 'правило'], desc: 'Регламент поведения на сайте, цитирования и публикации материалов' },
+      { title: 'Пользовательское соглашение', type_label: 'Документ', url: '/user-agreement', keys: ['соглашение', 'пользовательское соглашение', 'условия', 'user agreement'], desc: 'Официальное пользовательское соглашение портала' },
+      { title: 'Политика конфиденциальности (152-ФЗ)', type_label: 'Документ', url: '/privacy-policy', keys: ['политика', 'конфиденциальность', '152-фз', 'персональные данные', 'обработка данных', 'privacy policy'], desc: 'Политика обработки и защиты персональных данных пользователей' },
+      { title: 'Карта сайта', type_label: 'Страница', url: '/sitemap', keys: ['карта сайта', 'навигация', 'sitemap', 'все разделы', 'карта'], desc: 'Полная иерархическая карта разделов и материалов портала' }
+    ];
+
+    for (const sp of systemPages) {
+      let matched = false;
+      if (sp.title.toLowerCase().includes(qLower) || sp.desc.toLowerCase().includes(qLower)) {
+        matched = true;
+      } else {
+        for (const k of sp.keys) {
+          if (k.includes(qLower) || qLower.includes(k)) {
+            matched = true;
+            break;
+          }
+        }
+      }
+      if (matched) {
+        results.push({
+          title: sp.title,
+          type_label: sp.type_label,
+          url: sp.url,
+          date: 'Раздел',
+          snippet: sp.desc
+        });
+      }
+    }
+
     const newsMatches = db.prepare(`SELECT * FROM news WHERE title LIKE ? OR excerpt LIKE ? LIMIT 15`).all(queryLike, queryLike);
     for (const n of newsMatches) {
       results.push({

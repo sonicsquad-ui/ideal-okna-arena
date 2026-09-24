@@ -7,6 +7,15 @@
 session_start();
 require_once __DIR__ . '/config.php';
 
+// Гарантированное определение resolveImg для админки
+if (!function_exists('resolveImg')) {
+    function resolveImg($path) {
+        if (!$path) return '/images/hero-tennis-ball.jpg';
+        if (strpos($path, 'http') === 0) return $path;
+        return $path;
+    }
+}
+
 $action = isset($_GET['action']) ? $_GET['action'] : 'dashboard';
 $error = null;
 $success = null;
@@ -190,18 +199,28 @@ if ($action === 'page_delete' && isset($_GET['id'])) {
 if ($action === 'blog_save' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = (int)($_POST['id'] ?? 0);
     $title = trim($_POST['title'] ?? '');
-    $slug = transliterate(trim($_POST['slug'] ?: $title));
+    if (!$title) {
+        $title = 'Статья о теннисе от ' . date('d.m.Y H:i');
+    }
+    $rawSlug = trim($_POST['slug'] ?? '');
+    $slug = transliterate($rawSlug ?: $title);
+    if (!$slug) {
+        $slug = 'article-' . time();
+    }
     $category = trim($_POST['category'] ?? 'previews');
+    if (!$category) $category = 'previews';
     $excerpt = trim($_POST['excerpt'] ?? '');
-    $content = $_POST['content'] ?? '';
+    $content = trim($_POST['content'] ?? '');
     $image = trim($_POST['image'] ?? '/images/hero-tennis-ball.jpg');
+    if (!$image) $image = '/images/hero-tennis-ball.jpg';
     $authorName = trim($_POST['author_name'] ?? 'Михаил Соколов');
     $authorRole = trim($_POST['author_role'] ?? 'Главный редактор');
     $authorAvatar = trim($_POST['author_avatar'] ?? '/images/author-coach.jpg');
     $readingTime = (int)($_POST['reading_time'] ?? 5);
+    if ($readingTime < 1) $readingTime = 5;
     $isEditorsChoice = isset($_POST['is_editors_choice']) ? 1 : 0;
-    $metaTitle = trim($_POST['meta_title'] ?? '');
-    $metaDesc = trim($_POST['meta_description'] ?? '');
+    $metaTitle = trim($_POST['meta_title'] ?? ($title . ' — Чемпион-Теннис'));
+    $metaDesc = trim($_POST['meta_description'] ?? ($excerpt ?: mb_substr(strip_tags($content), 0, 160)));
 
     if ($id > 0) {
         $stmt = $pdo->prepare("UPDATE articles SET category = ?, slug = ?, title = ?, excerpt = ?, content = ?, image = ?, author_name = ?, author_role = ?, author_avatar = ?, reading_time = ?, is_editors_choice = ?, meta_title = ?, meta_description = ? WHERE id = ?");
@@ -243,18 +262,27 @@ if ($action === 'blog_delete' && isset($_GET['id'])) {
 if ($action === 'news_save' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = (int)($_POST['id'] ?? 0);
     $title = trim($_POST['title'] ?? '');
-    $slug = transliterate(trim($_POST['slug'] ?: $title));
+    if (!$title) {
+        $title = 'Новость о теннисе от ' . date('d.m.Y H:i');
+    }
+    $rawSlug = trim($_POST['slug'] ?? '');
+    $slug = transliterate($rawSlug ?: $title);
+    if (!$slug) {
+        $slug = 'news-' . time();
+    }
     $category = trim($_POST['category'] ?? 'atp');
+    if (!$category) $category = 'atp';
     $excerpt = trim($_POST['excerpt'] ?? '');
-    $content = $_POST['content'] ?? '';
+    $content = trim($_POST['content'] ?? '');
     $image = trim($_POST['image'] ?? '/images/news-medvedev.jpg');
+    if (!$image) $image = '/images/news-medvedev.jpg';
     $sourceName = trim($_POST['source_name'] ?? 'Собственная служба новостей');
     $sourceUrl = trim($_POST['source_url'] ?? '');
     $author = trim($_POST['author'] ?? 'Редакция Champion-Tennis.ru');
     $isFeatured = isset($_POST['is_featured']) ? 1 : 0;
     $isHot24 = isset($_POST['is_hot_24h']) ? 1 : 0;
-    $metaTitle = trim($_POST['meta_title'] ?? '');
-    $metaDesc = trim($_POST['meta_description'] ?? '');
+    $metaTitle = trim($_POST['meta_title'] ?? ($title . ' — Чемпион-Теннис'));
+    $metaDesc = trim($_POST['meta_description'] ?? ($excerpt ?: mb_substr(strip_tags($content), 0, 160)));
 
     if ($id > 0) {
         $stmt = $pdo->prepare("UPDATE news SET category = ?, slug = ?, title = ?, excerpt = ?, content = ?, image = ?, source_name = ?, source_url = ?, author = ?, is_featured = ?, is_hot_24h = ?, meta_title = ?, meta_description = ? WHERE id = ?");
@@ -677,25 +705,29 @@ if ($action === 'save_blocks' && $_SERVER['REQUEST_METHOD'] === 'POST') {
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($articles as $art): ?>
-                                <tr>
-                                    <td>#<?= $art['id'] ?></td>
-                                    <td><img src="<?= htmlspecialchars(resolveImg($art['image'])) ?>" style="width:50px; height:36px; object-fit:cover; border-radius:4px;" alt=""></td>
-                                    <td>
-                                        <strong><?= htmlspecialchars($art['title']) ?></strong><br>
-                                        <a href="/blog/<?= htmlspecialchars($art['category']) ?>/<?= htmlspecialchars($art['slug']) ?>" target="_blank" style="font-size:0.775rem; color:#0a5c36;">/blog/<?= htmlspecialchars($art['category']) ?>/<?= htmlspecialchars($art['slug']) ?> &nearr;</a>
-                                    </td>
-                                    <td><span style="background:#f1f5f9; padding:3px 8px; border-radius:4px; font-size:0.75rem; font-weight:700;"><?= strtoupper($art['category']) ?></span></td>
-                                    <td><?= htmlspecialchars($art['author_name']) ?></td>
-                                    <td><?= formatNewsDate($art['published_at']) ?></td>
-                                    <td><?= $art['is_editors_choice'] ? '⭐ Да' : '—' ?></td>
-                                    <td>
-                                        <a href="admin.php?action=blog_edit&id=<?= $art['id'] ?>" class="btn-admin btn-admin-primary btn-admin-sm">✏️ Редактор</a>
-                                        <a href="admin.php?action=blog_duplicate&id=<?= $art['id'] ?>" class="btn-admin btn-admin-secondary btn-admin-sm">📋 Копия</a>
-                                        <a href="admin.php?action=blog_delete&id=<?= $art['id'] ?>" class="btn-admin btn-admin-danger btn-admin-sm" onclick="return confirm('Удалить эту статью?')">🗑️</a>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
+                            <?php if (empty($articles)): ?>
+                                <tr><td colspan="8" style="text-align:center; padding:24px; color:#64748b;">Статей пока нет. Нажмите «+ Новая статья блога» для создания.</td></tr>
+                            <?php else: ?>
+                                <?php foreach ($articles as $art): ?>
+                                    <tr>
+                                        <td>#<?= $art['id'] ?></td>
+                                        <td><img src="<?= htmlspecialchars(resolveImg($art['image'] ?? '')) ?>" style="width:50px; height:36px; object-fit:cover; border-radius:4px; border:1px solid #e2e8f0;" alt=""></td>
+                                        <td>
+                                            <strong><?= htmlspecialchars($art['title'] ?: 'Без названия (черновик)') ?></strong><br>
+                                            <a href="/blog/<?= htmlspecialchars($art['category'] ?: 'general') ?>/<?= htmlspecialchars($art['slug'] ?: 'post-' . $art['id']) ?>" target="_blank" style="font-size:0.775rem; color:#0a5c36;">/blog/<?= htmlspecialchars($art['category'] ?: 'general') ?>/<?= htmlspecialchars($art['slug'] ?: 'post-' . $art['id']) ?> &nearr;</a>
+                                        </td>
+                                        <td><span style="background:#f1f5f9; padding:3px 8px; border-radius:4px; font-size:0.75rem; font-weight:700;"><?= strtoupper(htmlspecialchars($art['category'] ?: 'GENERAL')) ?></span></td>
+                                        <td><?= htmlspecialchars($art['author_name'] ?: 'Редакция') ?></td>
+                                        <td><?= formatNewsDate($art['published_at'] ?? '') ?></td>
+                                        <td><?= !empty($art['is_editors_choice']) ? '⭐ Да' : '—' ?></td>
+                                        <td>
+                                            <a href="admin.php?action=blog_edit&id=<?= $art['id'] ?>" class="btn-admin btn-admin-primary btn-admin-sm">✏️ Редактор</a>
+                                            <a href="admin.php?action=blog_duplicate&id=<?= $art['id'] ?>" class="btn-admin btn-admin-secondary btn-admin-sm">📋 Копия</a>
+                                            <a href="admin.php?action=blog_delete&id=<?= $art['id'] ?>" class="btn-admin btn-admin-danger btn-admin-sm" onclick="return confirm('Удалить эту статью?')">🗑️</a>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
@@ -810,7 +842,7 @@ if ($action === 'save_blocks' && $_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="admin-card-header">
                         <h2 class="admin-card-title">Лента новостей тенниса</h2>
                         <div style="display:flex; gap:10px;">
-                            <a href="cron_news.php" target="_blank" class="btn-admin btn-admin-warning btn-admin-sm">⚡ Запустить сбор новостей</a>
+                            <a href="cron_news.php?token=champion2026secret" target="_blank" class="btn-admin btn-admin-warning btn-admin-sm">⚡ Запустить сбор новостей (08:00 МСК)</a>
                             <a href="admin.php?action=news_edit" class="btn-admin btn-admin-primary btn-admin-sm">+ Добавить новость</a>
                         </div>
                     </div>
@@ -830,23 +862,27 @@ if ($action === 'save_blocks' && $_SERVER['REQUEST_METHOD'] === 'POST') {
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($newsList as $n): ?>
-                                <tr>
-                                    <td>#<?= $n['id'] ?></td>
-                                    <td><img src="<?= htmlspecialchars(resolveImg($n['image'])) ?>" style="width:50px; height:36px; object-fit:cover; border-radius:4px;" alt=""></td>
-                                    <td>
-                                        <strong><?= htmlspecialchars($n['title']) ?></strong><br>
-                                        <a href="/news/<?= htmlspecialchars($n['category']) ?>/<?= htmlspecialchars($n['slug']) ?>" target="_blank" style="font-size:0.775rem; color:#0a5c36;">/news/<?= htmlspecialchars($n['category']) ?>/<?= htmlspecialchars($n['slug']) ?> &nearr;</a>
-                                    </td>
-                                    <td><span style="background:#e0f2fe; color:#0369a1; padding:3px 8px; border-radius:4px; font-size:0.75rem; font-weight:700;"><?= strtoupper($n['category']) ?></span></td>
-                                    <td><strong><?= formatNewsDate($n['published_at']) ?></strong></td>
-                                    <td><?= $n['views'] ?></td>
-                                    <td>
-                                        <a href="admin.php?action=news_edit&id=<?= $n['id'] ?>" class="btn-admin btn-admin-primary btn-admin-sm">✏️</a>
-                                        <a href="admin.php?action=news_delete&id=<?= $n['id'] ?>" class="btn-admin btn-admin-danger btn-admin-sm" onclick="return confirm('Удалить эту новость?')">🗑️</a>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
+                            <?php if (empty($newsList)): ?>
+                                <tr><td colspan="7" style="text-align:center; padding:24px; color:#64748b;">Новостей пока нет. Нажмите «+ Добавить новость» или «⚡ Запустить сбор новостей».</td></tr>
+                            <?php else: ?>
+                                <?php foreach ($newsList as $n): ?>
+                                    <tr>
+                                        <td>#<?= $n['id'] ?></td>
+                                        <td><img src="<?= htmlspecialchars(resolveImg($n['image'] ?? '')) ?>" style="width:50px; height:36px; object-fit:cover; border-radius:4px; border:1px solid #e2e8f0;" alt=""></td>
+                                        <td>
+                                            <strong><?= htmlspecialchars($n['title'] ?: 'Без названия (черновик)') ?></strong><br>
+                                            <a href="/news/<?= htmlspecialchars($n['category'] ?: 'atp') ?>/<?= htmlspecialchars($n['slug'] ?: 'news-' . $n['id']) ?>" target="_blank" style="font-size:0.775rem; color:#0a5c36;">/news/<?= htmlspecialchars($n['category'] ?: 'atp') ?>/<?= htmlspecialchars($n['slug'] ?: 'news-' . $n['id']) ?> &nearr;</a>
+                                        </td>
+                                        <td><span style="background:#e0f2fe; color:#0369a1; padding:3px 8px; border-radius:4px; font-size:0.75rem; font-weight:700;"><?= strtoupper(htmlspecialchars($n['category'] ?: 'ATP')) ?></span></td>
+                                        <td><strong><?= formatNewsDate($n['published_at'] ?? '') ?></strong></td>
+                                        <td><?= $n['views'] ?? 0 ?></td>
+                                        <td>
+                                            <a href="admin.php?action=news_edit&id=<?= $n['id'] ?>" class="btn-admin btn-admin-primary btn-admin-sm">✏️</a>
+                                            <a href="admin.php?action=news_delete&id=<?= $n['id'] ?>" class="btn-admin btn-admin-danger btn-admin-sm" onclick="return confirm('Удалить эту новость?')">🗑️</a>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
@@ -945,20 +981,24 @@ if ($action === 'save_blocks' && $_SERVER['REQUEST_METHOD'] === 'POST') {
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($gearList as $g): ?>
-                                <tr>
-                                    <td>#<?= $g['id'] ?></td>
-                                    <td><img src="<?= htmlspecialchars(resolveImg($g['image'])) ?>" style="width:50px; height:36px; object-fit:cover; border-radius:4px;" alt=""></td>
-                                    <td><strong><?= htmlspecialchars($g['brand']) ?> <?= htmlspecialchars($g['title']) ?></strong></td>
-                                    <td><?= htmlspecialchars($g['category']) ?></td>
-                                    <td><strong style="color:#c84c1f;"><?= htmlspecialchars($g['price']) ?></strong></td>
-                                    <td>⭐ <?= $g['rating'] ?>/10</td>
-                                    <td>
-                                        <a href="admin.php?action=gear_edit&id=<?= $g['id'] ?>" class="btn-admin btn-admin-primary btn-admin-sm">✏️</a>
-                                        <a href="admin.php?action=gear_delete&id=<?= $g['id'] ?>" class="btn-admin btn-admin-danger btn-admin-sm" onclick="return confirm('Удалить эту модель?')">🗑️</a>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
+                            <?php if (empty($gearList)): ?>
+                                <tr><td colspan="7" style="text-align:center; padding:24px; color:#64748b;">Экипировки пока нет. Нажмите «+ Добавить модель».</td></tr>
+                            <?php else: ?>
+                                <?php foreach ($gearList as $g): ?>
+                                    <tr>
+                                        <td>#<?= $g['id'] ?></td>
+                                        <td><img src="<?= htmlspecialchars(resolveImg($g['image'] ?? '')) ?>" style="width:50px; height:36px; object-fit:cover; border-radius:4px; border:1px solid #e2e8f0;" alt=""></td>
+                                        <td><strong><?= htmlspecialchars($g['brand'] ?? '') ?> <?= htmlspecialchars($g['title'] ?: 'Без названия') ?></strong></td>
+                                        <td><?= htmlspecialchars($g['category'] ?? 'rackets') ?></td>
+                                        <td><strong style="color:#c84c1f;"><?= htmlspecialchars($g['price'] ?? '—') ?></strong></td>
+                                        <td>⭐ <?= htmlspecialchars($g['rating'] ?? '9.0') ?>/10</td>
+                                        <td>
+                                            <a href="admin.php?action=gear_edit&id=<?= $g['id'] ?>" class="btn-admin btn-admin-primary btn-admin-sm">✏️</a>
+                                            <a href="admin.php?action=gear_delete&id=<?= $g['id'] ?>" class="btn-admin btn-admin-danger btn-admin-sm" onclick="return confirm('Удалить эту модель?')">🗑️</a>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
