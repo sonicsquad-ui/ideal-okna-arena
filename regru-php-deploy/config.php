@@ -25,68 +25,82 @@ try {
 }
 
 // Почта для уведомлений о заявках (строго скрыта от публичной части сайта)
-define('TARGET_EMAIL', 'sonicsquad@mail.ru');
+if (!defined('TARGET_EMAIL')) {
+    define('TARGET_EMAIL', 'sonicsquad@mail.ru');
+}
 
 // Отправка email через стандартную функцию mail() хостинга REG.RU
-function sendAdminNotification($subject, $body) {
-    $to = TARGET_EMAIL;
-    $headers = "MIME-Version: 1.0\r\n";
-    $headers .= "Content-Type: text/plain; charset=utf-8\r\n";
-    $headers .= "From: no-reply@champion-tennis.ru\r\n";
-    $headers .= "X-Mailer: PHP/" . phpversion();
+if (!function_exists('sendAdminNotification')) {
+    function sendAdminNotification($subject, $body) {
+        $to = TARGET_EMAIL;
+        $headers = "MIME-Version: 1.0\r\n";
+        $headers .= "Content-Type: text/plain; charset=utf-8\r\n";
+        $headers .= "From: no-reply@champion-tennis.ru\r\n";
+        $headers .= "X-Mailer: PHP/" . phpversion();
 
-    @mail($to, $subject, $body, $headers);
+        @mail($to, $subject, $body, $headers);
+    }
 }
 
 // Транслитерация для SEO URL
-function transliterate($str) {
-    $ruMap = [
-        'а'=>'a', 'б'=>'b', 'в'=>'v', 'г'=>'g', 'д'=>'d', 'е'=>'e', 'ё'=>'yo',
-        'ж'=>'zh', 'з'=>'z', 'и'=>'i', 'й'=>'y', 'к'=>'k', 'л'=>'l', 'м'=>'m',
-        'н'=>'o', 'о'=>'o', 'п'=>'p', 'р'=>'r', 'с'=>'s', 'т'=>'t', 'у'=>'u',
-        'ф'=>'f', 'х'=>'kh', 'ц'=>'ts', 'ч'=>'ch', 'ш'=>'sh', 'щ'=>'shch',
-        'ъ'=>'', 'ы'=>'y', 'ь'=>'', 'э'=>'e', 'ю'=>'yu', 'я'=>'ya'
-    ];
-    $str = mb_strtolower(trim($str), 'UTF-8');
-    $res = '';
-    for ($i = 0; $i < mb_strlen($str, 'UTF-8'); $i++) {
-        $c = mb_substr($str, $i, 1, 'UTF-8');
-        if (isset($ruMap[$c])) {
-            $res .= $ruMap[$c];
-        } elseif (preg_match('/[a-z0-9]/', $c)) {
-            $res .= $c;
-        } elseif (preg_match('/[\s\-_]/', $c)) {
-            $res .= '-';
+if (!function_exists('transliterate')) {
+    function transliterate($str) {
+        $ruMap = [
+            'а'=>'a', 'б'=>'b', 'в'=>'v', 'г'=>'g', 'д'=>'d', 'е'=>'e', 'ё'=>'yo',
+            'ж'=>'zh', 'з'=>'z', 'и'=>'i', 'й'=>'y', 'к'=>'k', 'л'=>'l', 'м'=>'m',
+            'н'=>'o', 'о'=>'o', 'п'=>'p', 'р'=>'r', 'с'=>'s', 'т'=>'t', 'у'=>'u',
+            'ф'=>'f', 'х'=>'kh', 'ц'=>'ts', 'ч'=>'ch', 'ш'=>'sh', 'щ'=>'shch',
+            'ъ'=>'', 'ы'=>'y', 'ь'=>'', 'э'=>'e', 'ю'=>'yu', 'я'=>'ya'
+        ];
+        $str = mb_strtolower(trim($str), 'UTF-8');
+        $res = '';
+        for ($i = 0; $i < mb_strlen($str, 'UTF-8'); $i++) {
+            $c = mb_substr($str, $i, 1, 'UTF-8');
+            if (isset($ruMap[$c])) {
+                $res .= $ruMap[$c];
+            } elseif (preg_match('/[a-z0-9]/', $c)) {
+                $res .= $c;
+            } elseif (preg_match('/[\s\-_]/', $c)) {
+                $res .= '-';
+            }
         }
+        $res = preg_replace('/-+/', '-', $res);
+        return trim($res, '-');
     }
-    $res = preg_replace('/-+/', '-', $res);
-    return trim($res, '-');
 }
 
-// Вспомогательная функция разрешения путей к картинкам (доступна глобально)
-function resolveImg($path) {
-    if (!$path) return '/images/hero-tennis-ball.jpg';
-    if (strpos($path, 'http') === 0) return $path;
-    return $path;
+// Вспомогательная функция разрешения путей к картинкам
+if (!function_exists('resolveImg')) {
+    function resolveImg($path) {
+        if (!$path) return '/images/hero-tennis-ball.jpg';
+        if (strpos($path, 'http') === 0) return $path;
+        return $path;
+    }
 }
 
 // Точный формат даты и времени по ТЗ: ДД.ММ.ГГГГ ЧЧ:ММ
-function formatNewsDate($dateStr) {
-    if (!$dateStr) return date('d.m.Y H:i');
-    $timestamp = strtotime($dateStr);
-    if (!$timestamp) return $dateStr;
-    return date('d.m.Y H:i', $timestamp);
-}
-
-function formatDateRu($dateStr) {
-    return formatNewsDate($dateStr);
-}
-
-function getGlobalSettings($pdo) {
-    $settings = [];
-    $stmt = $pdo->query("SELECT key, value_json FROM global_blocks");
-    while ($row = $stmt->fetch()) {
-        $settings[$row['key']] = json_decode($row['value_json'], true);
+if (!function_exists('formatNewsDate')) {
+    function formatNewsDate($dateStr) {
+        if (!$dateStr) return date('d.m.Y H:i');
+        $timestamp = strtotime($dateStr);
+        if (!$timestamp) return $dateStr;
+        return date('d.m.Y H:i', $timestamp);
     }
-    return $settings;
+}
+
+if (!function_exists('formatDateRu')) {
+    function formatDateRu($dateStr) {
+        return formatNewsDate($dateStr);
+    }
+}
+
+if (!function_exists('getGlobalSettings')) {
+    function getGlobalSettings($pdo) {
+        $settings = [];
+        $stmt = $pdo->query("SELECT key, value_json FROM global_blocks");
+        while ($row = $stmt->fetch()) {
+            $settings[$row['key']] = json_decode($row['value_json'], true);
+        }
+        return $settings;
+    }
 }

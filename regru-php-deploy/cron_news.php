@@ -94,6 +94,7 @@ $sources = [
 ];
 
 // Функция безопасного скачивания с таймаутом
+if (!function_exists('fetchUrlContent')) {
 function fetchUrlContent($url) {
     if (!filter_var($url, FILTER_VALIDATE_URL)) return false;
     
@@ -110,8 +111,10 @@ function fetchUrlContent($url) {
     
     return @file_get_contents($url, false, $ctx);
 }
+}
 
 // Умный алгоритм журналистского рерайта заголовков
+if (!function_exists('rewriteHeadline')) {
 function rewriteHeadline($title) {
     $title = trim(strip_tags($title));
     $synonyms = [
@@ -131,6 +134,7 @@ function rewriteHeadline($title) {
         $rewritten = str_ireplace($from, $to, $rewritten);
     }
     return $rewritten;
+}
 }
 
 // Расширенный пул редакционных материалов на случай сетевой блокировки хостингом
