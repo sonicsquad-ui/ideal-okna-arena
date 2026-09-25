@@ -112,33 +112,41 @@ function renderShareBlock($url, $title, $type = 'материалом') {
     $safeUrl = htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
     $safeTitle = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
     $jsSafeTitle = htmlspecialchars(addslashes($title), ENT_QUOTES, 'UTF-8');
+    $safeType = htmlspecialchars($type, ENT_QUOTES, 'UTF-8');
 
-    return '
+    ob_start();
+    ?>
     <div class="article-sharing-bar">
       <div class="sharing-label">
         <svg style="width:18px; height:18px; stroke:#0a5c36; fill:none; display:inline-block; vertical-align:-3px; margin-right:4px;" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
-        <span>Поделиться ' . htmlspecialchars($type) . ':</span>
+        <span>Поделиться <?= $safeType ?>:</span>
       </div>
       <div class="social-share-buttons">
-        <a href="https://t.me/share/url?url=' . $encUrl . '&text=' . $encTitle . '" target="_blank" rel="noopener" class="share-btn share-btn-tg" title="Поделиться в Telegram">✈️ Telegram</a>
-        <a href="https://vk.com/share.php?url=' . $encUrl . '&title=' . $encTitle . '" target="_blank" rel="noopener" class="share-btn share-btn-vk" title="Поделиться во ВКонтакте">🔵 ВКонтакте</a>
-        <a href="https://connect.ok.ru/offer?url=' . $encUrl . '&title=' . $encTitle . '" target="_blank" rel="noopener" class="share-btn share-btn-ok" title="Поделиться в Одноклассниках">🟠 Одноклассники</a>
-        <a href="https://connect.mail.ru/share?url=' . $encUrl . '&title=' . $encTitle . '" target="_blank" rel="noopener" class="share-btn share-btn-mm" title="Поделиться в Мой Мир">🔴 Мой Мир</a>
-        <button type="button" class="share-btn share-btn-max" onclick="shareToMax('' . $safeUrl . '', '' . $jsSafeTitle . '')" title="Поделиться в MAX мессенджер">💬 MAX</button>
-        <button type="button" class="share-btn share-btn-copy js-copy-link" onclick="copyPageUrl(this, '' . $safeUrl . '')" title="Скопировать ссылку в буфер обмена">🔗 Скопировать ссылку</button>
+        <a href="https://t.me/share/url?url=<?= $encUrl ?>&text=<?= $encTitle ?>" target="_blank" rel="noopener" class="share-btn share-btn-tg" title="Поделиться в Telegram">✈️ Telegram</a>
+        <a href="https://vk.com/share.php?url=<?= $encUrl ?>&title=<?= $encTitle ?>" target="_blank" rel="noopener" class="share-btn share-btn-vk" title="Поделиться во ВКонтакте">🔵 ВКонтакте</a>
+        <a href="https://connect.ok.ru/offer?url=<?= $encUrl ?>&title=<?= $encTitle ?>" target="_blank" rel="noopener" class="share-btn share-btn-ok" title="Поделиться в Одноклассниках">🟠 Одноклассники</a>
+        <a href="https://connect.mail.ru/share?url=<?= $encUrl ?>&title=<?= $encTitle ?>" target="_blank" rel="noopener" class="share-btn share-btn-mm" title="Поделиться в Мой Мир">🔴 Мой Мир</a>
+        <button type="button" class="share-btn share-btn-max" onclick="shareToMax('<?= $safeUrl ?>', '<?= $jsSafeTitle ?>')" title="Поделиться в MAX мессенджер">💬 MAX</button>
+        <button type="button" class="share-btn share-btn-copy js-copy-link" onclick="copyPageUrl(this, '<?= $safeUrl ?>')" title="Скопировать ссылку в буфер обмена">🔗 Скопировать ссылку</button>
       </div>
-    </div>';
+    </div>
+    <?php
+    return ob_get_clean();
 }
 
 // Генератор обязательного чекбокса согласия с политикой обработки данных (Требование 1)
 function renderFormAgreementCheckbox($suffix = 'main') {
-    return '
+    $safeSuffix = htmlspecialchars($suffix, ENT_QUOTES, 'UTF-8');
+    ob_start();
+    ?>
     <div class="form-agree-wrap">
-      <input type="checkbox" name="agree" class="form-agree-checkbox" id="agreeCheckbox_' . htmlspecialchars($suffix) . '" required>
-      <label for="agreeCheckbox_' . htmlspecialchars($suffix) . '">
+      <input type="checkbox" name="agree" class="form-agree-checkbox" id="agreeCheckbox_<?= $safeSuffix ?>" required>
+      <label for="agreeCheckbox_<?= $safeSuffix ?>">
         Нажимая кнопку, вы соглашаетесь с <a href="/privacy-policy" target="_blank">Политикой обработки данных</a>.
       </label>
-    </div>';
+    </div>
+    <?php
+    return ob_get_clean();
 }
 
 // ==========================================
